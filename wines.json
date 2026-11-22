@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795344454947",
+    "name": "ヴィッラ・アモーリス エリオドール モスカテッロ・セルヴァティコ 2024 (Villa Amoris Heliodor Moscatello Selvatico)",
+    "type": "白",
+    "grape": "モスカテッロ・セルヴァティコ (Moscatello Selvatico)",
+    "country": "イタリア",
+    "region": "プーリア州（Puglia IGP / バーリ県チェッラマーレ）",
+    "purchaseDate": "2026-11-22",
+    "image": "images/wine_1795344454947.jpg",
+    "winery": "Di Gioia S.R.L. Industrie Agroalimentari（カンティーネ・ディ・ジョイア）",
+    "shop": "世界のワイン葡萄屋 鶴見店",
+    "notes": "2024年ヴィンテージ、アルコール度数12.5%。プーリア州の希少な土着品種モスカテッロ・セルヴァティコ100%で造られるアロマティックな白ワイン（輸入元：株式会社キングジャパン / リーファー定温輸送品）。"
+  },
+  {
     "id": "wine_1795342882382",
     "name": "ビアンコ コスタベッラ (Bianco Costabella)",
     "type": "白",
