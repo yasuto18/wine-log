@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Wine Cellar & Log</title>
+  <title>ワイン日記</title>
   <style>
     :root {
       --bg-color: #faf9f6;
@@ -26,7 +26,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
       background-color: var(--bg-color);
       color: var(--text-main);
-      line-height: 1.6;
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -37,7 +37,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      padding: 14px 20px;
+      padding: 12px 16px;
     }
 
     .header-inner {
@@ -45,43 +45,46 @@
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
-    }
-
-    h1 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
       gap: 8px;
     }
 
+    h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
     .count-badge {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 600;
       background: #f5f5f4;
       color: var(--text-muted);
-      padding: 2px 10px;
+      padding: 2px 9px;
       border-radius: 999px;
+      white-space: nowrap;
     }
 
     .header-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .btn {
-      padding: 8px 14px;
+      padding: 7px 12px;
       border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
       border: 1px solid var(--border-light);
@@ -90,7 +93,9 @@
       transition: all 0.15s;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
     }
 
     .btn:hover { background: #f5f5f4; }
@@ -104,7 +109,7 @@
     .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       justify-content: space-between;
     }
@@ -117,10 +122,10 @@
 
     .search-box input {
       width: 100%;
-      padding: 8px 14px 8px 34px;
+      padding: 8px 14px 8px 38px !important; /* 虫眼鏡との重なり防止 */
       border: 1px solid var(--border-light);
       border-radius: 999px;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       background-color: #f5f5f4;
     }
 
@@ -132,23 +137,33 @@
 
     .search-icon {
       position: absolute;
-      left: 12px;
+      left: 13px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
       font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
     }
 
     .filter-pills {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .pill {
-      padding: 5px 13px;
+      padding: 4px 11px;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       border: 1px solid var(--border-light);
       background: var(--surface-color);
@@ -164,29 +179,31 @@
     .pill.active[data-type="ロゼ"] { background: var(--rose-border); color: #fff; border-color: var(--rose-border); }
 
     .sort-select {
-      padding: 6px 10px;
+      padding: 5px 8px;
       border-radius: 8px;
       border: 1px solid var(--border-light);
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       background: var(--surface-color);
+      color: var(--text-main);
+      flex-shrink: 0;
     }
 
     /* メイングリッド */
     main {
       max-width: 1100px;
-      margin: 24px auto 60px;
-      padding: 0 20px;
+      margin: 16px auto 50px;
+      padding: 0 16px;
     }
 
     .wine-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 24px;
+      gap: 20px;
     }
 
     .wine-card {
       background: var(--surface-color);
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -196,8 +213,8 @@
     }
 
     .wine-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
     }
 
     .wine-card[data-type="赤"] { border-color: var(--red-border); }
@@ -218,16 +235,17 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       display: block;
     }
 
     .type-badge {
       position: absolute;
-      top: 12px;
-      left: 12px;
-      padding: 4px 12px;
+      top: 10px;
+      left: 10px;
+      padding: 3px 10px;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
@@ -238,43 +256,63 @@
     .type-badge[data-type="ロゼ"] { background: var(--rose-bg); color: var(--rose-text); border: 1px solid var(--rose-border); }
 
     .card-body {
-      padding: 16px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
       flex: 1;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .card-date { font-size: 0.78rem; color: var(--text-muted); }
-    .card-title { font-size: 1.05rem; font-weight: 700; line-height: 1.4; }
+    .card-date { font-size: 0.74rem; color: var(--text-muted); }
+    .card-title { font-size: 1rem; font-weight: 700; line-height: 1.35; }
 
     .card-meta {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      font-size: 0.84rem;
+      gap: 3px;
+      font-size: 0.8rem;
       color: #44403c;
       margin-top: auto;
-      padding-top: 8px;
+      padding-top: 6px;
       border-top: 1px dashed var(--border-light);
     }
 
     .meta-row { display: flex; gap: 6px; }
-    .meta-label { font-size: 0.75rem; color: var(--text-muted); min-width: 44px; }
+    .meta-label { font-size: 0.72rem; color: var(--text-muted); min-width: 34px; flex-shrink: 0; }
+    .meta-val {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     .detail-btn {
-      margin-top: 10px;
+      margin-top: 8px;
       width: 100%;
-      padding: 8px;
+      padding: 7px;
       border: 1px solid var(--border-light);
       background-color: #fafaf9;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
     }
 
     .detail-btn:hover { background-color: #2c2825; color: #fff; border-color: #2c2825; }
+
+    /* スマホ画面専用：1画面に1ボトル収める最適化 */
+    @media (max-width: 600px) {
+      header { padding: 10px 14px; }
+      .header-inner { gap: 8px; }
+      main { margin: 12px auto 40px; padding: 0 14px; }
+      .wine-grid { gap: 16px; }
+      .card-image-wrap {
+        aspect-ratio: auto;
+        height: 235px; /* スマホ1画面内にカード全体が収まる高さ */
+      }
+      .card-body { padding: 10px 12px; gap: 5px; }
+      .card-title { font-size: 0.96rem; }
+      .detail-btn { margin-top: 6px; padding: 6px; }
+    }
 
     /* 共通モーダル */
     .modal-overlay {
@@ -286,7 +324,7 @@
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      padding: 16px;
+      padding: 14px;
     }
 
     .modal-overlay.open { display: flex; }
@@ -298,7 +336,7 @@
       max-height: 92vh;
       border-radius: 18px;
       overflow-y: auto;
-      padding: 24px;
+      padding: 20px;
       box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
     }
 
@@ -332,23 +370,23 @@
     .modal-image-pane img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       max-height: 90vh;
     }
 
     .modal-info-pane {
-      padding: 24px;
+      padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
+      gap: 10px;
     }
 
     .close-btn {
@@ -370,50 +408,50 @@
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       background: #fafaf9;
-      padding: 14px;
+      padding: 12px;
       border-radius: 12px;
       border: 1px solid var(--border-light);
     }
 
     .detail-item { display: flex; flex-direction: column; gap: 2px; }
     .detail-item.full { grid-column: 1 / -1; }
-    .detail-label { font-size: 0.74rem; color: var(--text-muted); font-weight: 600; }
-    .detail-value { font-size: 0.9rem; font-weight: 500; }
+    .detail-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+    .detail-value { font-size: 0.88rem; font-weight: 500; }
 
     .notes-text {
-      font-size: 0.9rem;
-      line-height: 1.65;
+      font-size: 0.88rem;
+      line-height: 1.6;
       white-space: pre-wrap;
       background: #fff;
-      padding: 12px;
+      padding: 10px;
       border-radius: 10px;
       border: 1px solid var(--border-light);
     }
 
     /* フォーム要素 */
-    .form-group { margin-bottom: 14px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #44403c; }
+    .form-group { margin-bottom: 12px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: #44403c; }
     input[type="text"], input[type="password"], input[type="date"], select, textarea {
       width: 100%;
-      padding: 9px 12px;
+      padding: 8px 11px;
       border: 1px solid var(--border-light);
       border-radius: 8px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-family: inherit;
     }
-    textarea { resize: vertical; min-height: 80px; }
+    textarea { resize: vertical; min-height: 75px; }
 
     .json-paste-box {
       background: #f5f5f4;
-      padding: 12px;
+      padding: 10px;
       border-radius: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       border: 1px dashed #a8a29e;
     }
 
     .preview-img {
-      max-height: 160px;
+      max-height: 150px;
       border-radius: 8px;
       margin-top: 8px;
       display: none;
@@ -421,22 +459,24 @@
 
     .status-toast {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       background: #2c2825;
       color: #fff;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 0.88rem;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.84rem;
       font-weight: 600;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
       z-index: 2000;
       display: none;
+      white-space: nowrap;
     }
 
     @media (max-width: 720px) {
       .detail-modal-content { grid-template-columns: 1fr; }
-      .modal-image-pane { max-height: 280px; }
+      .modal-image-pane { max-height: 260px; }
       .form-row { grid-template-columns: 1fr; }
     }
   </style>
@@ -446,28 +486,30 @@
   <header>
     <div class="header-inner">
       <div class="header-top">
-        <h1>🍷 My Wine Log <span class="count-badge" id="wineCount">0本</span></h1>
+        <h1>🍷 ワイン日記 <span class="count-badge" id="wineCount">0本</span></h1>
         <div class="header-actions">
-          <button class="btn btn-primary" onclick="openAddModal()">＋ ワイン追加</button>
+          <button class="btn btn-primary" onclick="openAddModal()">＋ 追加</button>
           <button class="btn" onclick="openSettingsModal()" title="GitHub連携設定">⚙️</button>
         </div>
       </div>
       <div class="controls">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="ワイン名・品種・国・地域・日付で検索...">
+          <input type="text" id="searchInput" placeholder="ワイン名・品種・国・地域・日付で検索">
         </div>
-        <div class="filter-pills" id="filterPills">
-          <button class="pill active" data-type="all">すべて</button>
-          <button class="pill" data-type="赤">赤</button>
-          <button class="pill" data-type="白">白</button>
-          <button class="pill" data-type="オレンジ">オレンジ</button>
-          <button class="pill" data-type="ロゼ">ロゼ</button>
+        <div class="filter-row">
+          <div class="filter-pills" id="filterPills">
+            <button class="pill active" data-type="all">すべて</button>
+            <button class="pill" data-type="赤">赤</button>
+            <button class="pill" data-type="白">白</button>
+            <button class="pill" data-type="オレンジ">オレンジ</button>
+            <button class="pill" data-type="ロゼ">ロゼ</button>
+          </div>
+          <select class="sort-select" id="sortSelect">
+            <option value="newest">新しい順</option>
+            <option value="oldest">古い順</option>
+          </select>
         </div>
-        <select class="sort-select" id="sortSelect">
-          <option value="newest">買った日：新しい順</option>
-          <option value="oldest">買った日：古い順</option>
-        </select>
       </div>
     </div>
   </header>
@@ -486,7 +528,7 @@
         <div class="modal-header">
           <div>
             <span class="type-badge" id="modalBadge" style="position: static; display: inline-block;">赤</span>
-            <h2 style="font-size: 1.3rem; margin-top: 6px;" id="modalTitle">ワイン名</h2>
+            <h2 style="font-size: 1.2rem; margin-top: 6px;" id="modalTitle">ワイン名</h2>
           </div>
           <button class="close-btn" onclick="closeModal('detailModal')">✕</button>
         </div>
@@ -505,7 +547,7 @@
           <div class="notes-text" id="modalNotes" style="margin-top: 4px;">-</div>
         </div>
 
-        <div style="margin-top: auto; padding-top: 12px; display: flex; justify-content: flex-end;">
+        <div style="margin-top: auto; padding-top: 10px; display: flex; justify-content: flex-end;">
           <button class="btn btn-danger" id="deleteWineBtn">🗑️ この記録を削除する</button>
         </div>
       </div>
@@ -515,15 +557,15 @@
   <!-- 2. ワイン追加モーダル -->
   <div class="modal-overlay" id="addModal">
     <div class="modal-box">
-      <div class="modal-header" style="margin-bottom: 16px;">
-        <h2>🍷 新しいワインを記録（GitHubへ自動保存）</h2>
+      <div class="modal-header" style="margin-bottom: 14px;">
+        <h2 style="font-size: 1.15rem;">🍷 新しいワインを記録</h2>
         <button class="close-btn" onclick="closeModal('addModal')">✕</button>
       </div>
 
       <!-- GeminiからのJSON貼り付けサポート -->
       <div class="json-paste-box">
         <label style="color: #2c2825;">✨ Gemini解析データ自動入力（任意）</label>
-        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px;">チャットでGeminiが出力したJSONコードを貼り付けると下のフォームが自動入力されます。</p>
+        <p style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px;">チャットでGeminiが出力したJSONコードを貼り付けると自動入力されます。</p>
         <div style="display: flex; gap: 6px;">
           <input type="text" id="jsonPasteInput" placeholder='{"name": "...", "type": "赤", ...}'>
           <button type="button" class="btn" onclick="applyGeminiJson()">反映</button>
@@ -532,7 +574,7 @@
 
       <form id="addWineForm" onsubmit="handleSaveWine(event)">
         <div class="form-group">
-          <label>ボトル写真（自動でリサイズ・軽量化されます） *</label>
+          <label>ボトル写真（自動で最適化されます） *</label>
           <input type="file" id="inImage" accept="image/*" required onchange="previewFile(event)">
           <img id="imgPreview" class="preview-img" alt="プレビュー">
         </div>
@@ -590,7 +632,7 @@
           <textarea id="inNotes" placeholder="香り、味わい、合わせた料理などのメモ"></textarea>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
           <button type="button" class="btn" onclick="closeModal('addModal')">キャンセル</button>
           <button type="submit" class="btn btn-primary" id="saveSubmitBtn">GitHubに保存して公開</button>
         </div>
@@ -601,16 +643,16 @@
   <!-- 3. GitHub連携設定モーダル -->
   <div class="modal-overlay" id="settingsModal">
     <div class="modal-box">
-      <div class="modal-header" style="margin-bottom: 14px;">
-        <h2>⚙️ GitHub 自動連携設定</h2>
+      <div class="modal-header" style="margin-bottom: 12px;">
+        <h2 style="font-size: 1.15rem;">⚙️ GitHub 自動連携設定</h2>
         <button class="close-btn" onclick="closeModal('settingsModal')">✕</button>
       </div>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;">
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
         設定情報はあなたのブラウザ内（localStorage）にのみ保存され、外部やGitHubのコードには公開されません。
       </p>
       <div class="form-group">
         <label>GitHub ユーザー名（Owner） *</label>
-        <input type="text" id="cfgOwner" placeholder="例：kazuto-yasuda">
+        <input type="text" id="cfgOwner" placeholder="例：yasuto18">
       </div>
       <div class="form-group">
         <label>リポジトリ名（Repo） *</label>
@@ -622,10 +664,9 @@
       </div>
       <div class="form-group">
         <label>Personal Access Token (PAT) *</label>
-        <input type="password" id="cfgToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-        <span style="font-size: 0.74rem; color: var(--text-muted);">※リポジトリの Contents 読み書き権限（repo または Fine-grained の Contents: Read & Write）が必要です。</span>
+        <input type="password" id="cfgToken" placeholder="github_pat_xxxxxxxxxxxx">
       </div>
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;">
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
         <button type="button" class="btn" onclick="closeModal('settingsModal')">閉じる</button>
         <button type="button" class="btn btn-primary" onclick="saveSettings()">設定を保存</button>
       </div>
@@ -640,7 +681,6 @@
     let currentSearch = "";
     let currentSort = "newest";
 
-    // トースト通知
     function showToast(msg, duration = 3500) {
       const toast = document.getElementById("statusToast");
       toast.textContent = msg;
@@ -648,7 +688,6 @@
       setTimeout(() => { toast.style.display = "none"; }, duration);
     }
 
-    // 設定の取得・保存
     function getGitHubConfig() {
       return {
         owner: localStorage.getItem("gh_wine_owner") || "",
@@ -673,7 +712,7 @@
       localStorage.setItem("gh_wine_branch", document.getElementById("cfgBranch").value.trim() || "main");
       localStorage.setItem("gh_wine_token", document.getElementById("cfgToken").value.trim());
       closeModal("settingsModal");
-      showToast("✅ GitHub設定をブラウザに保存しました");
+      showToast("✅ GitHub設定を保存しました");
       loadWines();
     }
 
@@ -694,7 +733,6 @@
       document.getElementById(id).classList.remove("open");
     }
 
-    // Geminiが出力したJSONをフォームに反映
     function applyGeminiJson() {
       const raw = document.getElementById("jsonPasteInput").value.trim();
       if (!raw) return;
@@ -716,7 +754,6 @@
       }
     }
 
-    // 画像プレビュー & リサイズ圧縮処理（最大幅1000px, JPEG 82%）
     function previewFile(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -747,7 +784,7 @@
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
             const dataUrl = canvas.toDataURL("image/jpeg", quality);
-            resolve(dataUrl.split(",")[1]); // Base64本体のみ返す
+            resolve(dataUrl.split(",")[1]);
           };
           img.onerror = reject;
           img.src = event.target.result;
@@ -757,7 +794,6 @@
       });
     }
 
-    // UTF-8文字列をBase64エンコード/デコード
     function utf8ToBase64(str) {
       return btoa(unescape(encodeURIComponent(str)));
     }
@@ -765,7 +801,6 @@
       return decodeURIComponent(escape(atob(b64)));
     }
 
-    // GitHub API ヘルパー
     async function githubRequest(path, method = "GET", body = null) {
       const cfg = getGitHubConfig();
       const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`;
@@ -786,7 +821,6 @@
       return res.json();
     }
 
-    // データ読み込み（API経由ならキャッシュ遅延なしで即時最新取得）
     async function loadWines() {
       const cfg = getGitHubConfig();
       try {
@@ -798,18 +832,17 @@
           if (res.ok) wineData = await res.json();
         }
       } catch (e) {
-        console.warn("wines.json読み込み待機または初期状態:", e);
+        console.warn("wines.json読み込み待機:", e);
         wineData = [];
       }
       renderWines();
     }
 
-    // 新規ワイン保存処理（画像アップロード ＋ wines.json更新）
     async function handleSaveWine(event) {
       event.preventDefault();
       const btn = document.getElementById("saveSubmitBtn");
       btn.disabled = true;
-      btn.textContent = "GitHubへアップロード中...";
+      btn.textContent = "保存中...";
 
       try {
         const cfg = getGitHubConfig();
@@ -818,7 +851,6 @@
         const id = "wine_" + Date.now();
         const imagePath = `images/${id}.jpg`;
 
-        // 1. 画像圧縮＆GitHubへアップロード
         showToast("📸 画像を最適化してアップロード中...");
         const base64Image = await compressImageToBase64(file);
         await githubRequest(imagePath, "PUT", {
@@ -827,7 +859,6 @@
           branch: cfg.branch
         });
 
-        // 2. 最新のwines.jsonを取得して追記
         showToast("📝 ワインデータを更新中...");
         let currentList = [];
         let fileSha = null;
@@ -835,9 +866,7 @@
           const existing = await githubRequest(`wines.json?ref=${cfg.branch}`);
           fileSha = existing.sha;
           currentList = JSON.parse(base64ToUtf8(existing.content));
-        } catch (e) {
-          // wines.jsonがまだ無い場合は新規作成
-        }
+        } catch (e) {}
 
         const newWine = {
           id,
@@ -867,7 +896,7 @@
         wineData = currentList;
         renderWines();
         closeModal("addModal");
-        showToast("🎉 保存完了！数十秒後に公開ページにも反映されます", 5000);
+        showToast("🎉 保存完了！数十秒後に公開ページにも反映されます", 4500);
       } catch (err) {
         alert("保存に失敗しました: " + err.message);
       } finally {
@@ -876,7 +905,6 @@
       }
     }
 
-    // ワイン削除処理
     async function deleteWine(id) {
       const cfg = getGitHubConfig();
       if (!cfg.owner || !cfg.repo || !cfg.token) {
@@ -885,11 +913,10 @@
       }
       const target = wineData.find(w => w.id === id);
       if (!target) return;
-      if (!confirm(`「${target.name}」の記録を削除しますか？\n（GitHubリポジトリからも削除されます）`)) return;
+      if (!confirm(`「${target.name}」の記録を削除しますか？`)) return;
 
       try {
         showToast("🗑️ 削除処理中...");
-        // 1. wines.jsonから削除
         const existing = await githubRequest(`wines.json?ref=${cfg.branch}`);
         const currentList = JSON.parse(base64ToUtf8(existing.content));
         const updatedList = currentList.filter(w => w.id !== id);
@@ -901,7 +928,6 @@
           branch: cfg.branch
         });
 
-        // 2. 画像ファイルも削除（存在する場合）
         if (target.image) {
           try {
             const imgMeta = await githubRequest(`${target.image}?ref=${cfg.branch}`);
@@ -910,7 +936,7 @@
               sha: imgMeta.sha,
               branch: cfg.branch
             });
-          } catch (e) { /* 画像が既になければ無視 */ }
+          } catch (e) {}
         }
 
         wineData = updatedList;
@@ -922,7 +948,6 @@
       }
     }
 
-    // プレースホルダー画像
     function getPlaceholderImage(type) {
       const colors = { "赤": "#4c0519", "白": "#713f12", "オレンジ": "#7c2d12", "ロゼ": "#881337" };
       const bg = colors[type] || "#292524";
@@ -930,7 +955,6 @@
       return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
     }
 
-    // 一覧描画
     function renderWines() {
       const wineGrid = document.getElementById("wineGrid");
       const query = currentSearch.toLowerCase().trim();
@@ -950,8 +974,8 @@
       document.getElementById("wineCount").textContent = `${filtered.length}本`;
 
       if (filtered.length === 0) {
-        wineGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-muted);">
-          ワインの記録がまだないか、検索条件に一致するものがありません。<br>右上の「＋ ワイン追加」から最初の1本を登録しましょう！
+        wineGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 16px; color:var(--text-muted); font-size:0.9rem;">
+          ワインの記録がまだないか、検索条件に一致するものがありません。<br>右上の「＋ 追加」から最初の1本を登録しましょう！
         </div>`;
         return;
       }
@@ -966,8 +990,8 @@
             <div class="card-date">買った日: ${wine.purchaseDate}</div>
             <h2 class="card-title">${wine.name}</h2>
             <div class="card-meta">
-              <div class="meta-row"><span class="meta-label">産地</span><span>${wine.country} / ${wine.region}</span></div>
-              <div class="meta-row"><span class="meta-label">品種</span><span>${wine.grape}</span></div>
+              <div class="meta-row"><span class="meta-label">産地</span><span class="meta-val">${wine.country} / ${wine.region}</span></div>
+              <div class="meta-row"><span class="meta-label">品種</span><span class="meta-val">${wine.grape}</span></div>
             </div>
             <button class="detail-btn" onclick="openDetail('${wine.id}')">詳細を見る</button>
           </div>
@@ -975,7 +999,6 @@
       `).join("");
     }
 
-    // 詳細表示
     function openDetail(id) {
       const wine = wineData.find(w => w.id === id);
       if (!wine) return;
@@ -1002,7 +1025,6 @@
       document.getElementById("detailModal").classList.add("open");
     }
 
-    // イベント設定
     document.getElementById("searchInput").addEventListener("input", e => { currentSearch = e.target.value; renderWines(); });
     document.getElementById("filterPills").addEventListener("click", e => {
       if (!e.target.classList.contains("pill")) return;
@@ -1013,7 +1035,6 @@
     });
     document.getElementById("sortSelect").addEventListener("change", e => { currentSort = e.target.value; renderWines(); });
 
-    // 初期化
     loadWines();
   </script>
 </body>
