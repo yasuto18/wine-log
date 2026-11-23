@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795399721364",
+    "name": "マルコ・デ・バルトリ ピエトラネーラ 2024 (Marco De Bartoli Pietranera)",
+    "type": "白",
+    "grape": "ジビッボ（モスカート・ダレッサンドリア）",
+    "country": "イタリア",
+    "region": "シチリア州（パンテッレリーア島 / テッレ・シチリアーネ IGP）",
+    "purchaseDate": "2026-06-14",
+    "image": "images/wine_1795399721364.jpg",
+    "winery": "Marco De Bartoli（マルコ・デ・バルトリ）",
+    "shop": "Regalo",
+    "notes": "2024年ヴィンテージ。シチリアの火山島パンテッレリーアの土着品種ジビッボ100%で造られる辛口白ワイン。華やかなアロマと火山性土壌由来の豊かなミネラル感が特徴。"
+  },
+  {
     "id": "wine_1795358332070",
     "name": "ポデーレ・カサノヴァ コルテ ロッソ・ディ・モンテプルチアーノ (Podere Casanova Corte Rosso di Montepulciano DOC)",
     "type": "赤",
