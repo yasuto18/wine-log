@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795399811249",
+    "name": "ボナヴィータ ファーロ 2018 (Bonavita Faro DOC)",
+    "type": "赤",
+    "grape": "ネレッロ・マスカレーゼ、ネレッロ・カプッチョ、ノチェーラ",
+    "country": "イタリア",
+    "region": "シチリア州（ファーロ DOC / メッシーナ）",
+    "purchaseDate": "2026-06-14",
+    "image": "images/wine_1795399811249.jpg",
+    "winery": "Azienda Agricola Bonavita di Giovanni Scarfone（ボナヴィータ）",
+    "shop": "Regalo",
+    "notes": "2018年ヴィンテージ、アルコール度数12.5%。シチリア北東部メッシーナ海峡を望む希少なアペラシオン「ファーロ DOC」のエレガントな辛口赤ワイン。"
+  },
+  {
     "id": "wine_1795399721364",
     "name": "マルコ・デ・バルトリ ピエトラネーラ 2024 (Marco De Bartoli Pietranera)",
     "type": "白",
