@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795400289781",
+    "name": "ジュゼッペ・コルテーゼ バルバレスコ ラバヤ 2019 (Giuseppe Cortese Barbaresco Rabajà DOCG)",
+    "type": "赤",
+    "grape": "ネッビオーロ (Nebbiolo)",
+    "country": "イタリア",
+    "region": "ピエモンテ州（バルバレスコ DOCG / ラバヤ）",
+    "purchaseDate": "2026-04-11",
+    "image": "images/wine_1795400289781.jpg",
+    "winery": "Giuseppe Cortese（ジュゼッペ・コルテーゼ）",
+    "shop": "Regalo",
+    "notes": "2019年ヴィンテージ、アルコール度数14.5%。バルバレスコ最高峰のクリュ（特級畑）「ラバヤ」のネッビオーロから造られる、力強さと気品を兼ね備えた辛口赤ワイン。"
+  },
+  {
     "id": "wine_1795400254339",
     "name": "ファルケンシュタイン ヴァイスブルグンダー / プライベート・リザーヴ (Falkenstein Weissburgunder / Private Reserve)",
     "type": "白",
