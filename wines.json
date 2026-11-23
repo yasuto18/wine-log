@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795400322723",
+    "name": "ピエロパン カルヴァリーノ ソアーヴェ・クラッシコ 2013 & 2023 (Pieropan Calvarino Soave Classico DOC)",
+    "type": "白",
+    "grape": "ガルガーネガ 70%、トレッビアーノ・ディ・ソアーヴェ 30%",
+    "country": "イタリア",
+    "region": "ヴェネト州（ソアーヴェ・クラッシコ DOC / カルヴァリーノ）",
+    "purchaseDate": "2026-04-11",
+    "image": "images/wine_1795400322723.jpg",
+    "winery": "Pieropan（ピエロパン）",
+    "shop": "Regalo",
+    "notes": "2013年熟成ヴィンテージ（左）と2023年最新ヴィンテージ（右）の垂直テイスティング。ソアーヴェの盟主ピエロパンが誇る単一畑カルヴァリーノの2世代比較。"
+  },
+  {
     "id": "wine_1795400289781",
     "name": "ジュゼッペ・コルテーゼ バルバレスコ ラバヤ 2019 (Giuseppe Cortese Barbaresco Rabajà DOCG)",
     "type": "赤",
