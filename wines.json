@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795399936627",
+    "name": "グアルド・デル・レ イル・グアルド サンジョヴェーゼ (Gualdo del Re Il Gualdo Sangiovese)",
+    "type": "赤",
+    "grape": "サンジョヴェーゼ (Sangiovese)",
+    "country": "イタリア",
+    "region": "トスカーナ州（ヴァル・ディ・コルニア DOC / スヴェレート）",
+    "purchaseDate": "2026-06-14",
+    "image": "images/wine_1795399936627.jpg",
+    "winery": "Gualdo del Re（グアルド・デル・レ）",
+    "shop": "Regalo",
+    "notes": "トスカーナ海岸部スヴェレートの実力派ワイナリー「グアルド・デル・レ」が手掛けるDOCG/DOCクラスのサンジョヴェーゼ100%辛口赤ワイン。"
+  },
+  {
     "id": "wine_1795399876144",
     "name": "ヴィニェティ・マッサ コスタ・デル・ヴェント デルトーナ 2021 (Vigneti Massa Costa del Vento Derthona)",
     "type": "白",
