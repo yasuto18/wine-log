@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795400773763",
+    "name": "ファルケンシュタイン ヴァイスブルグンダー / プライベート・リザーヴ (Falkenstein Weissburgunder / Private Reserve)",
+    "type": "白",
+    "grape": "ヴァイスブルグンダー（ピノ・ビアンコ）",
+    "country": "イタリア",
+    "region": "トレンティーノ＝アルト・アディジェ州（アルト・アディジェ・ヴァル・ヴェノスタ DOC / ヴィンシュガウ）",
+    "purchaseDate": "2026-04-11",
+    "image": "images/wine_1795400773763.jpg",
+    "winery": "Weingut Falkenstein（ファルケンシュタイン）",
+    "shop": "Regalo",
+    "notes": "スタンダードキュヴェ（左）と、トップキュヴェの「プライベート・リザーヴ（PR）」（右）の2本飲み比べ。イタリア最北端アルト・アディジェの冷涼な山岳地帯で造られる、研ぎ澄まされた酸とミネラルが魅力のピノ・ビアンコ。"
+  },
+  {
     "id": "wine_1795400414373",
     "name": "アンティキ・ヴィニェティ・ディ・カンタルーポ ゲンメ アンノ・プリモ 2014 (Antichi Vigneti di Cantalupo Ghemme Anno Primo DOCG)",
     "type": "赤",
