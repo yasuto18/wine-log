@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795399876144",
+    "name": "ヴィニェティ・マッサ コスタ・デル・ヴェント デルトーナ 2021 (Vigneti Massa Costa del Vento Derthona)",
+    "type": "白",
+    "grape": "ティモラッソ (Timorasso)",
+    "country": "イタリア",
+    "region": "ピエモンテ州（コッリ・トルトネージ DOC デルトーナ / モンレアーレ）",
+    "purchaseDate": "2026-11-23",
+    "image": "images/wine_1795399876144.jpg",
+    "winery": "Vigneti Massa（ヴィニェティ・マッサ）",
+    "shop": "Regalo",
+    "notes": "2021年ヴィンテージ。土着品種ティモラッソを復活させた第一人者ウォルター・マッサ氏が手掛ける単一畑の白ワイン。熟成ポテンシャルが高く重厚でミネラル豊か。"
+  },
+  {
     "id": "wine_1795399811249",
     "name": "ボナヴィータ ファーロ 2018 (Bonavita Faro DOC)",
     "type": "赤",
