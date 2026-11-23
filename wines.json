@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795400003013",
+    "name": "コス ジビッボ・イン・ピトス 2024 (COS Zibibbo in Pithos)",
+    "type": "オレンジ",
+    "grape": "ジビッボ（モスカート・ダレッサンドリア）",
+    "country": "イタリア",
+    "region": "シチリア州（テッレ・シチリアーネ IGP / ヴィットーリア）",
+    "purchaseDate": "2026-06-14",
+    "image": "images/wine_1795400003013.jpg",
+    "winery": "Azienda Agricola COS（コス）",
+    "shop": "Regalo",
+    "notes": "2024年ヴィンテージ、アルコール度数12%。シチリア自然派の名門COSが地中に埋めたテラコッタ製アンフォラ（ピトス）で醸し発酵・熟成させた芳香豊かなオレンジワイン。"
+  },
+  {
     "id": "wine_1795399936627",
     "name": "グアルド・デル・レ イル・グアルド サンジョヴェーゼ (Gualdo del Re Il Gualdo Sangiovese)",
     "type": "赤",
