@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795400414373",
+    "name": "アンティキ・ヴィニェティ・ディ・カンタルーポ ゲンメ アンノ・プリモ 2014 (Antichi Vigneti di Cantalupo Ghemme Anno Primo DOCG)",
+    "type": "赤",
+    "grape": "ネッビオーロ（スパンナ）",
+    "country": "イタリア",
+    "region": "ピエモンテ州（ゲンメ DOCG）",
+    "purchaseDate": "2026-04-11",
+    "image": "images/wine_1795400414373.jpg",
+    "winery": "Antichi Vigneti di Cantalupo（アンティキ・ヴィニェティ・ディ・カンタルーポ）",
+    "shop": "Regalo",
+    "notes": "2014年ヴィンテージ。北ピエモンテの名醸地ゲンメのトップ生産者が造る伝統派ネッビオーロ。熟成による枯れたニュアンスと繊細な酸味が魅力。"
+  },
+  {
     "id": "wine_1795400375241",
     "name": "ヴィッラ・カンビアージョ コーナ コロナータ ヴァル・ポルチェーヴェラ (Villa Cambiaso Cônâ Coronata Val Polcevera DOC)",
     "type": "白",
