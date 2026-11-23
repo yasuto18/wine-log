@@ -10,7 +10,6 @@
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
   <style>
     :root {
-      /* 指定カラーパレット */
       --bg-base: #121016;
       --surface-card: #2C2136;
       --surface-elevated: #362942;
@@ -23,7 +22,6 @@
       --text-muted: #a69cac;
       --border-subtle: rgba(166, 120, 58, 0.28);
 
-      /* ワインタイプ別フレーム＆バッジ色（ダークテーマ最適化） */
       --red-border: #9f2b48; --red-bg: rgba(159, 43, 72, 0.25); --red-text: #ff9eb5;
       --white-border: #d4af37; --white-bg: rgba(212, 175, 55, 0.22); --white-text: #fce588;
       --orange-border: #d97706; --orange-bg: rgba(217, 119, 6, 0.25); --orange-text: #fdba74;
@@ -56,6 +54,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      width: 100%;
     }
 
     .header-top {
@@ -63,6 +62,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
+      width: 100%;
     }
 
     h1 {
@@ -133,27 +133,30 @@
     .spin { animation: spin 0.8s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* 検索バー＆クイックフィルタードロワー */
+    /* 検索バー＆クイックフィルタードロワー（幅揃え最適化） */
     .search-section {
       display: flex;
       flex-direction: column;
       gap: 8px;
+      width: 100%;
     }
 
     .search-row {
       display: flex;
       gap: 8px;
       align-items: center;
+      width: 100%;
     }
 
     .search-box {
       position: relative;
-      flex: 1;
+      flex: 1 1 72%;
+      min-width: 0;
     }
 
     .search-box input {
       width: 100%;
-      padding: 8px 34px 8px 38px !important;
+      padding: 8px 32px 8px 36px !important;
       border: 1px solid var(--border-subtle);
       border-radius: 999px;
       font-size: 0.85rem;
@@ -192,21 +195,27 @@
       display: none;
     }
 
+    /* 並び替えセレクトは幅をコンパクトに固定 */
     .sort-select {
-      padding: 7px 9px;
-      border-radius: 8px;
+      flex: 0 0 auto;
+      width: auto !important;
+      min-width: 96px;
+      max-width: 124px;
+      padding: 8px 10px;
+      border-radius: 999px;
       border: 1px solid var(--border-subtle);
       font-size: 0.78rem;
       background: var(--surface-card);
       color: var(--text-main);
-      flex-shrink: 0;
+      cursor: pointer;
     }
 
-    /* 検索バークリックで展開するクイック絞り込みパネル */
+    /* クイック絞り込みパネルも親幅100%にピタッと揃える */
     .quick-filter-drawer {
       display: none;
       flex-direction: column;
       gap: 8px;
+      width: 100%;
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
@@ -409,7 +418,7 @@
     }
 
     .kpi-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; }
-    .kpi-value { font-size: 1.25rem; font-weight: 700; color: var(--accent-gold-light); }
+    .kpi-value { font-size: 1.2rem; font-weight: 700; color: var(--accent-gold-light); }
 
     .map-panel {
       background: var(--surface-card);
@@ -458,7 +467,7 @@
       position: absolute;
       bottom: 10px;
       left: 10px;
-      background: rgba(18, 16, 22, 0.85);
+      background: rgba(18, 16, 22, 0.88);
       border: 1px solid var(--border-subtle);
       padding: 6px 10px;
       border-radius: 8px;
@@ -519,11 +528,25 @@
       font-size: 0.72rem;
     }
 
-    .winery-plot-list {
+    /* 州ごとのワイナリー見出し＆リスト */
+    .region-group-block {
+      margin-top: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 4px;
+    }
+
+    .region-group-header {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--accent-gold-light);
+      padding: 4px 10px;
+      border-left: 3px solid var(--accent-gold);
+      background: rgba(166, 120, 58, 0.12);
+      border-radius: 0 6px 6px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .winery-plot-item {
@@ -538,7 +561,7 @@
       cursor: pointer;
     }
 
-    .winery-plot-item:hover { border-color: var(--accent-gold); }
+    .winery-plot-item:hover { border-color: var(--accent-gold); background: var(--surface-elevated); }
 
     /* モーダル共通 */
     .modal-overlay {
@@ -673,11 +696,15 @@
       .form-row { grid-template-columns: 1fr; }
     }
 
-    /* フォーム要素 */
+    /* フォーム要素（モーダル内限定にしてヘッダーのselectに影響させない） */
     .form-group { margin-bottom: 12px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: var(--accent-gold-light); }
-    input[type="text"], input[type="password"], input[type="date"], select, textarea {
+    .modal-box label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: var(--accent-gold-light); }
+    .modal-box input[type="text"],
+    .modal-box input[type="password"],
+    .modal-box input[type="date"],
+    .modal-box select,
+    .modal-box textarea {
       width: 100%;
       padding: 8px 11px;
       border: 1px solid var(--border-subtle);
@@ -687,7 +714,7 @@
       background: var(--bg-base);
       color: var(--text-main);
     }
-    textarea { resize: vertical; min-height: 75px; }
+    .modal-box textarea { resize: vertical; min-height: 75px; }
 
     .json-paste-box {
       background: var(--bg-base);
@@ -742,7 +769,7 @@
         <div class="search-row">
           <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="タップして絞り込み / キーワード検索" onfocus="openQuickFilter()">
+            <input type="text" id="searchInput" placeholder="ワイン名・品種・国・地域で検索" onfocus="openQuickFilter()">
             <button class="clear-search-btn" id="clearSearchBtn" onclick="resetAllFilters()">✕</button>
           </div>
           <select class="sort-select" id="sortSelect">
@@ -762,7 +789,6 @@
           </div>
           <div class="filter-group" id="countryFilterPills">
             <span class="filter-group-label">上位国</span>
-            <!-- JSで上位3カ国を自動生成 -->
           </div>
         </div>
       </div>
@@ -810,14 +836,13 @@
 
           <!-- 国別ショートカットボタン -->
           <div id="countryShortcutSection">
-            <div style="font-size:0.76rem; color:var(--text-muted); margin-bottom:6px;">国をタップすると県・州境界マップ＆ワイナリー位置へズームします：</div>
+            <div style="font-size:0.76rem; color:var(--text-muted); margin-bottom:6px;">国をタップすると州・県マップ＆ワイナリー一覧へ切り替わります：</div>
             <div class="country-chip-list" id="countryChipList"></div>
           </div>
 
-          <!-- 国ズーム時のワイナリー一覧 -->
+          <!-- 国ズーム時の州別ワイナリー一覧 -->
           <div id="wineryListSection" style="display:none;">
-            <div style="font-size:0.8rem; font-weight:700; color:var(--accent-gold-light); margin-bottom:6px;">📍 プロットされたワイナリー一覧</div>
-            <div class="winery-plot-list" id="wineryPlotList"></div>
+            <div id="wineryPlotList"></div>
           </div>
         </div>
       </div>
@@ -988,21 +1013,104 @@
     let currentSearch = "";
     let currentSort = "newest";
 
-    // 国名マッピング（日本語 ⇔ ISO数値コード / 英語名 / 行政区画TopoJSON URL）
+    // 国名マッピング＆行政区画GeoJSON/TopoJSON URL（高可用性ソース）
     const COUNTRY_META = {
-      "イタリア": { isoNum: "380", en: "Italy", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/italy/italy-regions.json" },
-      "フランス": { isoNum: "250", en: "France", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/france/france-departments.json" },
-      "スペイン": { isoNum: "724", en: "Spain", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/spain/spain-provinces.json" },
-      "日本": { isoNum: "392", en: "Japan", adminUrl: "https://raw.githubusercontent.com/dataofjapan/land/master/japan.topojson" },
-      "アメリカ": { isoNum: "840", en: "United States of America", adminUrl: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json" },
-      "チリ": { isoNum: "152", en: "Chile", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/chile/chile-regions.json" },
-      "ドイツ": { isoNum: "276", en: "Germany", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/germany/germany-states.json" },
-      "オーストラリア": { isoNum: "036", en: "Australia", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/australia/australia-states.json" },
-      "ニュージーランド": { isoNum: "554", en: "New Zealand", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/new-zealand/new-zealand-regional-councils.json" },
-      "アルゼンチン": { isoNum: "032", en: "Argentina", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/argentina/argentina-provinces.json" },
-      "ポルトガル": { isoNum: "620", en: "Portugal", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/portugal/portugal-districts.json" },
-      "南アフリカ": { isoNum: "710", en: "South Africa", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/south-africa/south-africa-provinces.json" }
+      "イタリア": {
+        isoNum: "380",
+        en: "Italy",
+        geoUrl: "https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson",
+        nameKeys: ["reg_name", "NAME_1", "name"]
+      },
+      "フランス": {
+        isoNum: "250",
+        en: "France",
+        geoUrl: "https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/regions-version-simplifiee.geojson",
+        nameKeys: ["nom", "NAME_1", "name"]
+      },
+      "スペイン": {
+        isoNum: "724",
+        en: "Spain",
+        geoUrl: "https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/spain-communities.geojson",
+        nameKeys: ["name", "NAME_1"]
+      },
+      "日本": {
+        isoNum: "392",
+        en: "Japan",
+        geoUrl: "https://raw.githubusercontent.com/dataofjapan/land/master/japan.topojson",
+        nameKeys: ["nam_ja", "nam", "name"]
+      },
+      "アメリカ": {
+        isoNum: "840",
+        en: "United States of America",
+        geoUrl: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json",
+        nameKeys: ["name", "NAME_1"]
+      },
+      "ドイツ": {
+        isoNum: "276",
+        en: "Germany",
+        geoUrl: "https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json",
+        nameKeys: ["name", "NAME_1"]
+      },
+      "チリ": { isoNum: "152", en: "Chile" },
+      "オーストラリア": { isoNum: "036", en: "Australia" },
+      "ニュージーランド": { isoNum: "554", en: "New Zealand" },
+      "アルゼンチン": { isoNum: "032", en: "Argentina" },
+      "ポルトガル": { isoNum: "620", en: "Portugal" },
+      "南アフリカ": { isoNum: "710", en: "South Africa" }
     };
+
+    // 日本語州名 → 地図データ上の州名（英語/イタリア語/フランス語等）への正規化マッピング
+    const REGION_ALIAS_TO_EN = {
+      // イタリア20州
+      "トスカーナ": "Toscana",
+      "ピエモンテ": "Piemonte",
+      "ヴェネト": "Veneto",
+      "シチリア": "Sicilia",
+      "プーリア": "Puglia",
+      "ラツィオ": "Lazio",
+      "ロンバルディア": "Lombardia",
+      "エミリア＝ロマーニャ": "Emilia-Romagna",
+      "エミリア・ロマーニャ": "Emilia-Romagna",
+      "フリウリ＝ヴェネツィア・ジューリア": "Friuli-Venezia Giulia",
+      "トレンティーノ＝アルト・アディジェ": "Trentino-Alto Adige/Südtirol",
+      "マルケ": "Marche",
+      "アブルッツォ": "Abruzzo",
+      "カンパニア": "Campania",
+      "サルデーニャ": "Sardegna",
+      "ウンブリア": "Umbria",
+      "カラブリア": "Calabria",
+      "バジリカータ": "Basilicata",
+      "リグーリア": "Liguria",
+      "モリーゼ": "Molise",
+      "ヴァッレ・ダオスタ": "Valle d'Aosta/Vallée d'Aoste",
+      // フランス主要地方
+      "ボルドー": "Nouvelle-Aquitaine",
+      "ブルゴーニュ": "Bourgogne-Franche-Comté",
+      "シャンパーニュ": "Grand Est",
+      "アルザス": "Grand Est",
+      "ロワール": "Pays de la Loire",
+      "ローヌ": "Auvergne-Rhône-Alpes",
+      "プロヴァンス": "Provence-Alpes-Côte d'Azur",
+      "ラングドック": "Occitanie"
+    };
+
+    // 製造された地域を優先して州・県名を抽出する関数
+    // 例: "ラツィオ州（ガッリカーノ・ネル・ラーツィオ） / 瓶詰：ヴェネト州コネリアーノ" -> "ラツィオ州"
+    function extractPrimaryRegion(regionStr) {
+      if (!regionStr) return "地域未設定";
+      // 「 / 瓶詰：〜」などの後半部分を切り捨てて製造地域を最優先
+      const primaryPart = regionStr.split("/")[0].replace(/（.*?）/g, "").replace(/\(.*?\)/g, "").trim();
+      // 「〇〇州」「〇〇県」「〇〇地方」が先頭にあれば抽出
+      const match = primaryPart.match(/^([^\s・]+?(?:州|県|府|道|地方))/);
+      if (match) return match[1];
+      return primaryPart || "地域未設定";
+    }
+
+    // 抽出した日本語地域名を地図のポリゴン名と照合するためのキー変換
+    function normalizeRegionForMap(jpRegion) {
+      const stripped = jpRegion.replace(/(州|県|地方)$/, "").trim();
+      return (REGION_ALIAS_TO_EN[stripped] || stripped).toLowerCase();
+    }
 
     function showToast(msg, duration = 3200) {
       const toast = document.getElementById("statusToast");
@@ -1011,7 +1119,6 @@
       setTimeout(() => { toast.style.display = "none"; }, duration);
     }
 
-    // リフレッシュボタン処理
     async function manualRefresh() {
       const btn = document.getElementById("refreshBtn");
       btn.classList.add("spin");
@@ -1021,13 +1128,8 @@
       showToast("✅ 最新の状態に更新しました");
     }
 
-    // ビュー切り替え（ホーム ⇔ ダッシュボード）
     function toggleDashboard() {
-      if (currentView === "home") {
-        switchView("dashboard");
-      } else {
-        switchView("home");
-      }
+      switchView(currentView === "home" ? "dashboard" : "home");
     }
 
     function switchView(view) {
@@ -1053,7 +1155,6 @@
       }
     }
 
-    // 検索バーのクイックフィルター展開・制御
     function openQuickFilter() {
       document.getElementById("quickFilterDrawer").classList.add("open");
     }
@@ -1061,7 +1162,6 @@
     document.addEventListener("click", (e) => {
       const searchSec = document.getElementById("homeSearchSection");
       if (searchSec && !searchSec.contains(e.target)) {
-        // フィルターが未選択かつ検索文字が空なら閉じる
         if (currentType === "all" && currentCountryFilter === "all" && !currentSearch) {
           document.getElementById("quickFilterDrawer").classList.remove("open");
         }
@@ -1084,7 +1184,6 @@
       renderWines();
     }
 
-    // 購入数上位3カ国のクイックフィルターボタンを生成
     function renderTopCountryFilters() {
       const counts = {};
       wineData.forEach(w => {
@@ -1125,7 +1224,6 @@
       });
     }
 
-    // GitHub API 設定・通信
     function getGitHubConfig() {
       return {
         owner: localStorage.getItem("gh_wine_owner") || "",
@@ -1469,7 +1567,7 @@
     }
 
     /* ==========================================
-       📊 ダッシュボード＆世界地図／県州マップ描画ロジック
+       📊 ダッシュボード＆世界地図／州・県コロプレス地図ロジック
        ========================================== */
     let worldTopoCache = null;
 
@@ -1502,12 +1600,12 @@
       renderWorldMap();
     }
 
-    // 明るさスケール（未購入は暗いプラム、購入数に応じてゴールドに明るく発光）
-    function getCountryFill(count, maxCount) {
+    // 購入数に応じた発光グラデーション（未購入はダークプラム、購入数が多いほど明るいゴールド）
+    function getHeatFill(count, maxCount) {
       if (!count || count === 0) return "#221a2b";
       const ratio = Math.min(1, count / Math.max(1, maxCount));
-      const interp = d3.interpolateRgb("#6E4B35", "#f5c16c");
-      return interp(0.25 + ratio * 0.75);
+      const interp = d3.interpolateRgb("#7d5336", "#ffd27d");
+      return interp(0.35 + ratio * 0.65);
     }
 
     async function renderWorldMap() {
@@ -1529,7 +1627,6 @@
       const g = svg.append("g");
       const tooltip = document.getElementById("mapTooltip");
 
-      // ズーム＆パン対応
       const zoom = d3.zoom().scaleExtent([1, 8]).on("zoom", (e) => {
         g.attr("transform", e.transform);
       });
@@ -1541,13 +1638,11 @@
       }
 
       const countries = topojson.feature(worldTopoCache, worldTopoCache.objects.countries);
-      // 南極を除外して見やすくする
       countries.features = countries.features.filter(d => d.id !== "010");
 
       const projection = d3.geoNaturalEarth1().fitSize([width, height], countries);
       const path = d3.geoPath().projection(projection);
 
-      // ISO番号と日本語国名の逆引きマップとカウント
       const isoToJp = {};
       Object.entries(COUNTRY_META).forEach(([jp, meta]) => { isoToJp[meta.isoNum] = jp; });
 
@@ -1566,7 +1661,7 @@
         .attr("fill", d => {
           const jpName = isoToJp[String(d.id).padStart(3, "0")];
           const cnt = jpName ? (countryCounts[jpName] || 0) : 0;
-          return getCountryFill(cnt, maxCount);
+          return getHeatFill(cnt, maxCount);
         })
         .attr("stroke", "#4A2E3A")
         .attr("stroke-width", 0.6)
@@ -1580,7 +1675,7 @@
           tooltip.style.display = "block";
           tooltip.style.left = (event.offsetX + 12) + "px";
           tooltip.style.top = (event.offsetY - 28) + "px";
-          tooltip.innerHTML = `<strong>${jpName}</strong>: ${cnt}本${cnt > 0 ? "（タップで拡大）" : ""}`;
+          tooltip.innerHTML = `<strong>${jpName}</strong>: ${cnt}本${cnt > 0 ? "（タップで州別表示）" : ""}`;
         })
         .on("mouseleave", () => { tooltip.style.display = "none"; })
         .on("click", (event, d) => {
@@ -1592,36 +1687,32 @@
         });
     }
 
-    // ワイナリー・地域名から緯度経度を検索（Nominatim API + localStorageキャッシュ）
-    async function geocodeLocation(query, countryEn) {
-      const cacheKey = "geo_cache_" + query;
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) return JSON.parse(cached);
-
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query + " " + countryEn)}`;
-        const res = await fetch(url, { headers: { "Accept-Language": "ja,en" } });
-        const data = await res.json();
-        if (data && data.length > 0) {
-          const coords = [parseFloat(data[0].lon), parseFloat(data[0].lat)];
-          localStorage.setItem(cacheKey, JSON.stringify(coords));
-          return coords;
-        }
-      } catch (e) {}
-      return null;
-    }
-
-    // 国クリック時：県・州ごとの境界線マップへ遷移し、ワイナリー位置をプロット
+    // 国選択時：州・県境界マップを描画し、製造地域優先で州ごとの購入数に応じて明るく発光させる
     async function zoomToCountry(jpCountryName) {
       const meta = COUNTRY_META[jpCountryName];
       const targetWines = wineData.filter(w => (w.country || "").trim() === jpCountryName);
 
-      document.getElementById("mapViewTitle").textContent = `📍 ${jpCountryName}のワイナリーマップ（${targetWines.length}本）`;
+      document.getElementById("mapViewTitle").textContent = `🗺️ ${jpCountryName}の産地マップ（${targetWines.length}本）`;
       document.getElementById("backToWorldBtn").style.display = "inline-flex";
-      document.getElementById("mapLegend").style.display = "none";
+      document.getElementById("mapLegend").style.display = "flex";
       document.getElementById("countryShortcutSection").style.display = "none";
       document.getElementById("wineryListSection").style.display = "block";
 
+      // 1. 製造地域を優先して州・県ごとにグループ化＆カウント
+      const regionGroups = {};
+      const normalizedRegionCounts = {};
+      targetWines.forEach(w => {
+        const primaryReg = extractPrimaryRegion(w.region);
+        if (!regionGroups[primaryReg]) regionGroups[primaryReg] = [];
+        regionGroups[primaryReg].push(w);
+
+        const normKey = normalizeRegionForMap(primaryReg);
+        normalizedRegionCounts[normKey] = (normalizedRegionCounts[normKey] || 0) + 1;
+      });
+
+      const maxRegionCount = Math.max(1, ...Object.values(normalizedRegionCounts));
+
+      // 2. マップ描画エリア準備
       const wrap = document.getElementById("mapCanvasWrap");
       wrap.querySelectorAll("svg").forEach(el => el.remove());
 
@@ -1631,116 +1722,101 @@
       const g = svg.append("g");
       const tooltip = document.getElementById("mapTooltip");
 
-      const zoom = d3.zoom().scaleExtent([1, 12]).on("zoom", (e) => {
+      const zoom = d3.zoom().scaleExtent([1, 10]).on("zoom", (e) => {
         g.attr("transform", e.transform);
       });
       svg.call(zoom);
 
-      // 行政区画（県・州）境界線の読み込み
+      // 3. 行政区画（州・県）データを取得
       let geoFeature = null;
-      if (meta && meta.adminUrl) {
+      if (meta && meta.geoUrl) {
         try {
-          const res = await fetch(meta.adminUrl);
-          const topo = await res.json();
-          const objKey = Object.keys(topo.objects)[0];
-          geoFeature = topojson.feature(topo, topo.objects[objKey]);
+          const res = await fetch(meta.geoUrl);
+          const data = await res.json();
+          if (data.type === "Topology") {
+            const objKey = Object.keys(data.objects)[0];
+            geoFeature = topojson.feature(data, data.objects[objKey]);
+          } else {
+            geoFeature = data;
+          }
         } catch (e) {
-          console.warn("行政区画データ取得フォールバック:", e);
+          console.warn("州境界データ取得失敗:", e);
         }
       }
 
-      // フォールバック（万が一外部の県別TopoJSONが取れない場合は世界地図から該当国を拡大）
       if (!geoFeature && worldTopoCache && meta) {
         const worldCountries = topojson.feature(worldTopoCache, worldTopoCache.objects.countries);
         const matched = worldCountries.features.find(d => String(d.id).padStart(3, "0") === meta.isoNum);
         if (matched) geoFeature = matched;
       }
 
-      if (!geoFeature) return;
+      if (geoFeature) {
+        const projection = d3.geoMercator().fitExtent([[20, 20], [width - 20, height - 20]], geoFeature);
+        const path = d3.geoPath().projection(projection);
 
-      const projection = d3.geoMercator().fitExtent([[24, 24], [width - 24, height - 24]], geoFeature);
-      const path = d3.geoPath().projection(projection);
+        // 各州のポリゴンを描画し、購入数に応じて明るくする
+        g.selectAll("path")
+          .data(geoFeature.features || [geoFeature])
+          .enter()
+          .append("path")
+          .attr("d", path)
+          .attr("fill", d => {
+            const props = d.properties || {};
+            const candidateNames = (meta && meta.nameKeys ? meta.nameKeys : ["name", "NAME_1"])
+              .map(k => (props[k] || "").toLowerCase())
+              .filter(Boolean);
 
-      // 県・州ごとのポリゴン＆境界線を描画
-      g.selectAll("path")
-        .data(geoFeature.features || [geoFeature])
-        .enter()
-        .append("path")
-        .attr("d", path)
-        .attr("fill", "#2C2136")
-        .attr("stroke", "#A6783A")
-        .attr("stroke-width", 0.9)
-        .attr("stroke-opacity", 0.75)
-        .on("mousemove", (event, d) => {
-          const regName = (d.properties && (d.properties.NAME_1 || d.properties.name || d.properties.nam_ja)) || "";
-          if (!regName) return;
-          tooltip.style.display = "block";
-          tooltip.style.left = (event.offsetX + 12) + "px";
-          tooltip.style.top = (event.offsetY - 28) + "px";
-          tooltip.textContent = regName;
-        })
-        .on("mouseleave", () => { tooltip.style.display = "none"; });
+            let matchedCount = 0;
+            for (const [normKey, cnt] of Object.entries(normalizedRegionCounts)) {
+              if (candidateNames.some(cn => cn.includes(normKey) || normKey.includes(cn))) {
+                matchedCount += cnt;
+              }
+            }
+            return getHeatFill(matchedCount, maxRegionCount);
+          })
+          .attr("stroke", "#A6783A")
+          .attr("stroke-width", 0.9)
+          .attr("stroke-opacity", 0.85)
+          .on("mousemove", (event, d) => {
+            const props = d.properties || {};
+            const dispName = (meta && meta.nameKeys ? meta.nameKeys.map(k => props[k]).find(Boolean) : props.name) || "";
+            if (!dispName) return;
 
-      // ワイナリーの座標を解決して地図上にプロット
-      const plotListEl = document.getElementById("wineryPlotList");
-      plotListEl.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted);">📍 ワイナリーの位置を検索してプロット中...</div>`;
+            const lowName = dispName.toLowerCase();
+            let matchedCount = 0;
+            for (const [normKey, cnt] of Object.entries(normalizedRegionCounts)) {
+              if (lowName.includes(normKey) || normKey.includes(lowName)) matchedCount += cnt;
+            }
 
-      const countryEn = meta ? meta.en : jpCountryName;
-      const plottedItems = [];
-
-      for (const wine of targetWines) {
-        // 括弧内の原語や地域名を優先して検索精度を高める
-        const rawRegion = (wine.region || "").split("/")[0].replace(/（.*?）/g, "").trim();
-        const rawWinery = (wine.winery || "").replace(/（.*?）/g, "").trim();
-
-        let coords = null;
-        if (rawWinery) coords = await geocodeLocation(`${rawWinery} ${rawRegion}`, countryEn);
-        if (!coords && rawRegion) coords = await geocodeLocation(rawRegion, countryEn);
-
-        plottedItems.push({ wine, coords });
-      }
-
-      // プロットピンを描画
-      plottedItems.forEach(({ wine, coords }) => {
-        if (!coords) return;
-        const [x, y] = projection(coords);
-        if (isNaN(x) || isNaN(y)) return;
-
-        const pinGroup = g.append("g")
-          .attr("transform", `translate(${x}, ${y})`)
-          .style("cursor", "pointer")
-          .on("click", () => openDetail(wine.id))
-          .on("mousemove", (event) => {
             tooltip.style.display = "block";
             tooltip.style.left = (event.offsetX + 12) + "px";
-            tooltip.style.top = (event.offsetY - 34) + "px";
-            tooltip.innerHTML = `🍷 <strong>${wine.winery || wine.name}</strong><br><span style="color:#d4a359;">${wine.name}</span>`;
+            tooltip.style.top = (event.offsetY - 28) + "px";
+            tooltip.innerHTML = `<strong>${dispName}</strong>: ${matchedCount}本`;
           })
           .on("mouseleave", () => { tooltip.style.display = "none"; });
+      }
 
-        // 光彩リング
-        pinGroup.append("circle")
-          .attr("r", 9)
-          .attr("fill", "rgba(245, 193, 108, 0.28)");
+      // 4. 州名ごとの見出し付きワイナリー一覧を描画
+      const sortedRegions = Object.entries(regionGroups).sort((a, b) => b[1].length - a[1].length);
+      const plotListEl = document.getElementById("wineryPlotList");
 
-        // 中心ピン
-        pinGroup.append("circle")
-          .attr("r", 4.5)
-          .attr("fill", "#f5c16c")
-          .attr("stroke", "#121016")
-          .attr("stroke-width", 1.5);
-      });
-
-      // 下部のワイナリーリスト表示
-      plotListEl.innerHTML = plottedItems.map(({ wine, coords }) => `
-        <div class="winery-plot-item" onclick="openDetail('${wine.id}')">
-          <div>
-            <div style="font-size:0.84rem; font-weight:700; color:var(--text-main);">
-              ${coords ? "📍" : "🍷"} ${wine.winery || "ワイナリー未記載"}
-            </div>
-            <div style="font-size:0.75rem; color:var(--text-muted);">${wine.name}（${wine.region}）</div>
+      plotListEl.innerHTML = sortedRegions.map(([regName, wines]) => `
+        <div class="region-group-block">
+          <div class="region-group-header">
+            <span>📍 ${regName}</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">${wines.length}本</span>
           </div>
-          <span style="font-size:0.75rem; color:var(--accent-gold-light);">詳細 →</span>
+          ${wines.map(wine => `
+            <div class="winery-plot-item" onclick="openDetail('${wine.id}')">
+              <div>
+                <div style="font-size:0.85rem; font-weight:700; color:var(--text-main);">
+                  🍷 ${wine.winery || "ワイナリー未記載"}
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${wine.name}</div>
+              </div>
+              <span style="font-size:0.75rem; color:var(--accent-gold-light); white-space:nowrap;">詳細 →</span>
+            </div>
+          `).join("")}
         </div>
       `).join("");
     }
@@ -1766,7 +1842,6 @@
       renderWines();
     });
 
-    // 初期読み込み
     loadWines();
   </script>
 </body>
