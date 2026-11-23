@@ -6,27 +6,35 @@
   <title>ワイン日記</title>
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="icon" href="icon.png">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
   <style>
     :root {
-      --bg-color: #faf9f6;
-      --surface-color: #ffffff;
-      --text-main: #2c2825;
-      --text-muted: #78716c;
-      --border-light: #e7e5e4;
-      --primary: #2c2825;
-      
-      /* ワインタイプ別カラー */
-      --red-border: #881337; --red-bg: #fff1f2; --red-text: #881337;
-      --white-border: #d4af37; --white-bg: #fefce8; --white-text: #854d0e;
-      --orange-border: #d97706; --orange-bg: #fff7ed; --orange-text: #9a3412;
-      --rose-border: #f43f5e; --rose-bg: #ffe4e6; --rose-text: #be123c;
+      /* 指定カラーパレット */
+      --bg-base: #121016;
+      --surface-card: #2C2136;
+      --surface-elevated: #362942;
+      --accent-wine: #4A2E3A;
+      --accent-oak: #6E4B35;
+      --accent-gold: #A6783A;
+      --accent-gold-light: #d4a359;
+
+      --text-main: #f3eff5;
+      --text-muted: #a69cac;
+      --border-subtle: rgba(166, 120, 58, 0.28);
+
+      /* ワインタイプ別フレーム＆バッジ色（ダークテーマ最適化） */
+      --red-border: #9f2b48; --red-bg: rgba(159, 43, 72, 0.25); --red-text: #ff9eb5;
+      --white-border: #d4af37; --white-bg: rgba(212, 175, 55, 0.22); --white-text: #fce588;
+      --orange-border: #d97706; --orange-bg: rgba(217, 119, 6, 0.25); --orange-text: #fdba74;
+      --rose-border: #e15b78; --rose-bg: rgba(225, 91, 120, 0.25); --rose-text: #fecdd3;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-      background-color: var(--bg-color);
+      background-color: var(--bg-base);
       color: var(--text-main);
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
@@ -34,8 +42,8 @@
 
     /* ヘッダー */
     header {
-      background-color: var(--surface-color);
-      border-bottom: 1px solid var(--border-light);
+      background: linear-gradient(180deg, #1b1622 0%, #121016 100%);
+      border-bottom: 1px solid var(--border-subtle);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -58,19 +66,22 @@
     }
 
     h1 {
-      font-size: 1.2rem;
+      font-size: 1.18rem;
       font-weight: 700;
       display: flex;
       align-items: center;
       gap: 6px;
       white-space: nowrap;
+      color: var(--text-main);
+      letter-spacing: 0.03em;
     }
 
     .count-badge {
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 600;
-      background: #f5f5f4;
-      color: var(--text-muted);
+      background: var(--accent-wine);
+      color: var(--accent-gold-light);
+      border: 1px solid var(--border-subtle);
       padding: 2px 9px;
       border-radius: 999px;
       white-space: nowrap;
@@ -84,13 +95,13 @@
     }
 
     .btn {
-      padding: 7px 12px;
+      padding: 7px 11px;
       border-radius: 8px;
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
-      border: 1px solid var(--border-light);
-      background: var(--surface-color);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-card);
       color: var(--text-main);
       transition: all 0.15s;
       display: inline-flex;
@@ -100,41 +111,62 @@
       white-space: nowrap;
     }
 
-    .btn:hover { background: #f5f5f4; }
-    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .btn-primary:hover { background: #44403c; }
-    .btn-danger { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
-    .btn-danger:hover { background: #ffe4e6; }
+    .btn:hover { background: var(--surface-elevated); border-color: var(--accent-gold); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-wine), var(--accent-oak));
+      color: #fff;
+      border-color: var(--accent-gold);
+    }
+    .btn-primary:hover { filter: brightness(1.12); }
+    .btn-active-nav {
+      background: var(--accent-gold);
+      color: #121016;
+      border-color: var(--accent-gold-light);
+    }
+    .btn-danger {
+      background: rgba(159, 43, 72, 0.25);
+      color: #ff9eb5;
+      border-color: #9f2b48;
+    }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* 検索・フィルター */
-    .controls {
+    .spin { animation: spin 0.8s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* 検索バー＆クイックフィルタードロワー */
+    .search-section {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .search-row {
+      display: flex;
       gap: 8px;
       align-items: center;
-      justify-content: space-between;
     }
 
     .search-box {
       position: relative;
       flex: 1;
-      min-width: 220px;
     }
 
     .search-box input {
       width: 100%;
-      padding: 8px 14px 8px 38px !important;
-      border: 1px solid var(--border-light);
+      padding: 8px 34px 8px 38px !important;
+      border: 1px solid var(--border-subtle);
       border-radius: 999px;
       font-size: 0.85rem;
-      background-color: #f5f5f4;
+      background-color: var(--surface-card);
+      color: var(--text-main);
     }
 
+    .search-box input::placeholder { color: var(--text-muted); }
     .search-box input:focus {
       outline: none;
-      background-color: #fff;
-      border-color: #a8a29e;
+      border-color: var(--accent-gold);
+      background-color: var(--surface-elevated);
+      box-shadow: 0 0 0 2px rgba(166, 120, 58, 0.2);
     }
 
     .search-icon {
@@ -142,55 +174,96 @@
       left: 13px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-muted);
+      color: var(--accent-gold-light);
       font-size: 0.85rem;
       pointer-events: none;
     }
 
-    .filter-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      width: 100%;
-      justify-content: space-between;
+    .clear-search-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: none;
     }
 
-    .filter-pills {
+    .sort-select {
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.78rem;
+      background: var(--surface-card);
+      color: var(--text-main);
+      flex-shrink: 0;
+    }
+
+    /* 検索バークリックで展開するクイック絞り込みパネル */
+    .quick-filter-drawer {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px 12px;
+      animation: slideDown 0.18s ease-out;
+    }
+
+    .quick-filter-drawer.open { display: flex; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .filter-group {
       display: flex;
-      gap: 5px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group-label {
+      font-size: 0.72rem;
+      color: var(--accent-gold-light);
+      font-weight: 700;
+      min-width: 42px;
     }
 
     .pill {
       padding: 4px 11px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 600;
-      border: 1px solid var(--border-light);
-      background: var(--surface-color);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-base);
       color: var(--text-muted);
       cursor: pointer;
       white-space: nowrap;
+      transition: all 0.15s;
     }
 
-    .pill.active[data-type="all"] { background: #2c2825; color: #fff; border-color: #2c2825; }
+    .pill.active[data-type="all"] { background: var(--accent-gold); color: #121016; border-color: var(--accent-gold); }
     .pill.active[data-type="赤"] { background: var(--red-border); color: #fff; border-color: var(--red-border); }
-    .pill.active[data-type="白"] { background: var(--white-border); color: #fff; border-color: var(--white-border); }
+    .pill.active[data-type="白"] { background: var(--white-border); color: #121016; border-color: var(--white-border); }
     .pill.active[data-type="オレンジ"] { background: var(--orange-border); color: #fff; border-color: var(--orange-border); }
     .pill.active[data-type="ロゼ"] { background: var(--rose-border); color: #fff; border-color: var(--rose-border); }
-
-    .sort-select {
-      padding: 5px 8px;
-      border-radius: 8px;
-      border: 1px solid var(--border-light);
-      font-size: 0.76rem;
-      background: var(--surface-color);
-      color: var(--text-main);
-      flex-shrink: 0;
+    .pill.country-pill.active {
+      background: var(--accent-oak);
+      color: #fff;
+      border-color: var(--accent-gold-light);
     }
 
-    /* メイングリッド */
+    /* ビュー切り替え */
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* メイングリッド（ホーム画面） */
     main {
       max-width: 1100px;
       margin: 16px auto 50px;
@@ -204,19 +277,19 @@
     }
 
     .wine-card {
-      background: var(--surface-color);
+      background: var(--surface-card);
       border-radius: 14px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      border: 3px solid var(--border-light);
+      border: 2.5px solid var(--border-subtle);
     }
 
     .wine-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
     }
 
     .wine-card[data-type="赤"] { border-color: var(--red-border); }
@@ -224,12 +297,11 @@
     .wine-card[data-type="オレンジ"] { border-color: var(--orange-border); }
     .wine-card[data-type="ロゼ"] { border-color: var(--rose-border); }
 
-    /* ホーム画面の写真エリア：詳細画面と同じく見切れず全体表示 */
     .card-image-wrap {
       position: relative;
       width: 100%;
       aspect-ratio: 4 / 5;
-      background-color: #1c1917;
+      background-color: #0b090e;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -252,7 +324,7 @@
       border-radius: 999px;
       font-size: 0.72rem;
       font-weight: 700;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      backdrop-filter: blur(6px);
       z-index: 2;
     }
 
@@ -269,63 +341,211 @@
       gap: 6px;
     }
 
-    .card-date { font-size: 0.74rem; color: var(--text-muted); }
-    .card-title { font-size: 1rem; font-weight: 700; line-height: 1.35; }
+    .card-date { font-size: 0.74rem; color: var(--accent-gold-light); }
+    .card-title { font-size: 0.98rem; font-weight: 700; line-height: 1.35; color: var(--text-main); }
 
     .card-meta {
       display: flex;
       flex-direction: column;
       gap: 3px;
       font-size: 0.8rem;
-      color: #44403c;
+      color: var(--text-muted);
       margin-top: auto;
       padding-top: 6px;
-      border-top: 1px dashed var(--border-light);
+      border-top: 1px dashed var(--border-subtle);
     }
 
     .meta-row { display: flex; gap: 6px; }
-    .meta-label { font-size: 0.72rem; color: var(--text-muted); min-width: 34px; flex-shrink: 0; }
-    .meta-val {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    .meta-label { font-size: 0.72rem; color: var(--accent-gold); min-width: 34px; flex-shrink: 0; font-weight: 600; }
+    .meta-val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-main); }
 
     .detail-btn {
       margin-top: 8px;
       width: 100%;
       padding: 7px;
-      border: 1px solid var(--border-light);
-      background-color: #fafaf9;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--accent-wine);
+      color: var(--text-main);
       font-size: 0.82rem;
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
     }
 
-    .detail-btn:hover { background-color: #2c2825; color: #fff; border-color: #2c2825; }
+    .detail-btn:hover { background-color: var(--accent-gold); color: #121016; }
 
-    /* スマホ画面専用：1画面に1ボトル収める最適化 */
+    /* スマホ画面最適化 */
     @media (max-width: 600px) {
       header { padding: 10px 14px; }
-      .header-inner { gap: 8px; }
       main { margin: 12px auto 40px; padding: 0 14px; }
       .wine-grid { gap: 16px; }
-      .card-image-wrap {
-        aspect-ratio: auto;
-        height: 235px;
-      }
+      .card-image-wrap { aspect-ratio: auto; height: 230px; }
       .card-body { padding: 10px 12px; gap: 5px; }
-      .card-title { font-size: 0.96rem; }
+      .card-title { font-size: 0.94rem; }
       .detail-btn { margin-top: 6px; padding: 6px; }
     }
 
-    /* 共通モーダル */
+    /* ==========================================
+       📊 ダッシュボード＆マップビュー
+       ========================================== */
+    .dashboard-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .kpi-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .kpi-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; }
+    .kpi-value { font-size: 1.25rem; font-weight: 700; color: var(--accent-gold-light); }
+
+    .map-panel {
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .map-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent-gold-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .map-canvas-wrap {
+      width: 100%;
+      height: 360px;
+      background: #0d0b10;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-canvas-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .map-legend {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(18, 16, 22, 0.85);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-bar {
+      width: 60px;
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #2C2136, #6E4B35, #A6783A, #f5c16c);
+    }
+
+    .map-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(18, 16, 22, 0.95);
+      border: 1px solid var(--accent-gold);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      display: none;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .country-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .country-stat-chip {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-main);
+    }
+
+    .country-stat-chip:hover { border-color: var(--accent-gold); background: var(--surface-elevated); }
+    .country-stat-chip span.badge {
+      background: var(--accent-gold);
+      color: #121016;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+    }
+
+    .winery-plot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .winery-plot-item {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .winery-plot-item:hover { border-color: var(--accent-gold); }
+
+    /* モーダル共通 */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(28, 25, 23, 0.65);
-      backdrop-filter: blur(4px);
+      background: rgba(10, 8, 14, 0.82);
+      backdrop-filter: blur(5px);
       display: none;
       justify-content: center;
       align-items: center;
@@ -336,7 +556,8 @@
     .modal-overlay.open { display: flex; }
 
     .modal-box {
-      background: var(--surface-color);
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
       width: 100%;
       max-width: 600px;
       max-height: 90dvh;
@@ -344,12 +565,13 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding: 20px;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+      color: var(--text-main);
     }
 
-    /* 詳細モーダル専用レイアウト（PC版） */
+    /* 詳細モーダル */
     .detail-modal-content {
-      background: var(--surface-color);
+      background: var(--surface-card);
       width: 100%;
       max-width: 820px;
       max-height: 88dvh;
@@ -357,8 +579,8 @@
       overflow: hidden;
       display: grid;
       grid-template-columns: 1fr 1.15fr;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
-      border: 4px solid var(--border-light);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+      border: 3px solid var(--border-subtle);
     }
 
     .detail-modal-content[data-type="赤"] { border-color: var(--red-border); }
@@ -367,7 +589,7 @@
     .detail-modal-content[data-type="ロゼ"] { border-color: var(--rose-border); }
 
     .modal-image-pane {
-      background: #1c1917;
+      background: #0b090e;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -398,8 +620,9 @@
     }
 
     .close-btn {
-      background: #f5f5f4;
-      border: none;
+      background: var(--accent-wine);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
       width: 32px;
       height: 32px;
       border-radius: 50%;
@@ -415,28 +638,28 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      background: #fafaf9;
+      background: var(--bg-base);
       padding: 12px;
       border-radius: 12px;
-      border: 1px solid var(--border-light);
+      border: 1px solid var(--border-subtle);
     }
 
     .detail-item { display: flex; flex-direction: column; gap: 2px; }
     .detail-item.full { grid-column: 1 / -1; }
-    .detail-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
-    .detail-value { font-size: 0.88rem; font-weight: 500; }
+    .detail-label { font-size: 0.72rem; color: var(--accent-gold); font-weight: 600; }
+    .detail-value { font-size: 0.88rem; font-weight: 500; color: var(--text-main); }
 
     .notes-text {
       font-size: 0.88rem;
       line-height: 1.6;
       white-space: pre-wrap;
-      background: #fff;
+      background: var(--bg-base);
       padding: 10px;
       border-radius: 10px;
-      border: 1px solid var(--border-light);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
     }
 
-    /* スマホ版詳細モーダル：モーダル全体を縦スクロール可能にする */
     @media (max-width: 720px) {
       .detail-modal-content {
         display: block;
@@ -444,40 +667,34 @@
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
       }
-      .modal-image-pane {
-        height: 240px;
-        width: 100%;
-      }
-      .modal-image-pane img {
-        max-height: 240px;
-      }
-      .modal-info-pane {
-        overflow-y: visible;
-        padding: 16px;
-      }
+      .modal-image-pane { height: 240px; width: 100%; }
+      .modal-image-pane img { max-height: 240px; }
+      .modal-info-pane { overflow-y: visible; padding: 16px; }
       .form-row { grid-template-columns: 1fr; }
     }
 
     /* フォーム要素 */
     .form-group { margin-bottom: 12px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: #44403c; }
+    label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: var(--accent-gold-light); }
     input[type="text"], input[type="password"], input[type="date"], select, textarea {
       width: 100%;
       padding: 8px 11px;
-      border: 1px solid var(--border-light);
+      border: 1px solid var(--border-subtle);
       border-radius: 8px;
       font-size: 0.88rem;
       font-family: inherit;
+      background: var(--bg-base);
+      color: var(--text-main);
     }
     textarea { resize: vertical; min-height: 75px; }
 
     .json-paste-box {
-      background: #f5f5f4;
+      background: var(--bg-base);
       padding: 10px;
       border-radius: 10px;
       margin-bottom: 14px;
-      border: 1px dashed #a8a29e;
+      border: 1px dashed var(--accent-gold);
     }
 
     .preview-img {
@@ -492,13 +709,14 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: #2c2825;
+      background: var(--accent-wine);
+      border: 1px solid var(--accent-gold);
       color: #fff;
       padding: 10px 18px;
       border-radius: 999px;
       font-size: 0.84rem;
       font-weight: 600;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       z-index: 2000;
       display: none;
       white-space: nowrap;
@@ -510,36 +728,100 @@
   <header>
     <div class="header-inner">
       <div class="header-top">
-        <h1>🍷 ワイン日記 <span class="count-badge" id="wineCount">0本</span></h1>
+        <h1 onclick="switchView('home')" style="cursor:pointer;">🍷 ワイン日記 <span class="count-badge" id="wineCount">0本</span></h1>
         <div class="header-actions">
+          <button class="btn" id="refreshBtn" onclick="manualRefresh()" title="最新データに更新">🔄</button>
+          <button class="btn" id="dashboardToggleBtn" onclick="toggleDashboard()" title="ダッシュボード・世界地図">📊</button>
           <button class="btn btn-primary" onclick="openAddModal()">＋ 追加</button>
           <button class="btn" onclick="openSettingsModal()" title="GitHub連携設定">⚙️</button>
         </div>
       </div>
-      <div class="controls">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="ワイン名・品種・国・地域・日付で検索">
-        </div>
-        <div class="filter-row">
-          <div class="filter-pills" id="filterPills">
-            <button class="pill active" data-type="all">すべて</button>
-            <button class="pill" data-type="赤">赤</button>
-            <button class="pill" data-type="白">白</button>
-            <button class="pill" data-type="オレンジ">オレンジ</button>
-            <button class="pill" data-type="ロゼ">ロゼ</button>
+
+      <!-- 検索バー＆クリックで展開するクイック絞り込み -->
+      <div class="search-section" id="homeSearchSection">
+        <div class="search-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="タップして絞り込み / キーワード検索" onfocus="openQuickFilter()">
+            <button class="clear-search-btn" id="clearSearchBtn" onclick="resetAllFilters()">✕</button>
           </div>
           <select class="sort-select" id="sortSelect">
             <option value="newest">新しい順</option>
             <option value="oldest">古い順</option>
           </select>
         </div>
+
+        <div class="quick-filter-drawer" id="quickFilterDrawer">
+          <div class="filter-group" id="typeFilterPills">
+            <span class="filter-group-label">種類</span>
+            <button class="pill active" data-type="all">すべて</button>
+            <button class="pill" data-type="赤">赤</button>
+            <button class="pill" data-type="白">白</button>
+            <button class="pill" data-type="オレンジ">オレンジ</button>
+            <button class="pill" data-type="ロゼ">ロゼ</button>
+          </div>
+          <div class="filter-group" id="countryFilterPills">
+            <span class="filter-group-label">上位国</span>
+            <!-- JSで上位3カ国を自動生成 -->
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
   <main>
-    <div class="wine-grid" id="wineGrid"></div>
+    <!-- 1. ホーム一覧ビュー -->
+    <div id="homeView" class="view-section active">
+      <div class="wine-grid" id="wineGrid"></div>
+    </div>
+
+    <!-- 2. ダッシュボード＆世界地図ビュー -->
+    <div id="dashboardView" class="view-section">
+      <div class="dashboard-container">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">総記録本数</div>
+            <div class="kpi-value" id="kpiTotal">0本</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">制覇した国</div>
+            <div class="kpi-value" id="kpiCountries">0カ国</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">最多購入国</div>
+            <div class="kpi-value" id="kpiTopCountry">-</div>
+          </div>
+        </div>
+
+        <div class="map-panel">
+          <div class="map-header">
+            <div class="map-title" id="mapViewTitle">🌍 ワイン生産国マップ（明るさ＝購入数）</div>
+            <button class="btn" id="backToWorldBtn" style="display:none;" onclick="renderWorldMap()">← 世界地図に戻る</button>
+          </div>
+
+          <div class="map-canvas-wrap" id="mapCanvasWrap">
+            <div class="map-tooltip" id="mapTooltip"></div>
+            <div class="map-legend" id="mapLegend">
+              <span>少</span>
+              <div class="legend-bar"></div>
+              <span>多</span>
+            </div>
+          </div>
+
+          <!-- 国別ショートカットボタン -->
+          <div id="countryShortcutSection">
+            <div style="font-size:0.76rem; color:var(--text-muted); margin-bottom:6px;">国をタップすると県・州境界マップ＆ワイナリー位置へズームします：</div>
+            <div class="country-chip-list" id="countryChipList"></div>
+          </div>
+
+          <!-- 国ズーム時のワイナリー一覧 -->
+          <div id="wineryListSection" style="display:none;">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--accent-gold-light); margin-bottom:6px;">📍 プロットされたワイナリー一覧</div>
+            <div class="winery-plot-list" id="wineryPlotList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- 1. 詳細モーダル -->
@@ -552,7 +834,7 @@
         <div class="modal-header">
           <div>
             <span class="type-badge" id="modalBadge" style="position: static; display: inline-block;">赤</span>
-            <h2 style="font-size: 1.2rem; margin-top: 6px;" id="modalTitle">ワイン名</h2>
+            <h2 style="font-size: 1.18rem; margin-top: 6px;" id="modalTitle">ワイン名</h2>
           </div>
           <button class="close-btn" onclick="closeModal('detailModal')">✕</button>
         </div>
@@ -587,11 +869,11 @@
       </div>
 
       <div class="json-paste-box">
-        <label style="color: #2c2825;">✨ Gemini解析データ自動入力（任意）</label>
+        <label>✨ Gemini解析データ自動入力（任意）</label>
         <p style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 6px;">チャットでGeminiが出力したJSONコードを貼り付けると自動入力されます。</p>
         <div style="display: flex; gap: 6px;">
           <input type="text" id="jsonPasteInput" placeholder='{"name": "...", "type": "赤", ...}'>
-          <button type="button" class="btn" onclick="applyGeminiJson()">反映</button>
+          <button type="button" class="btn btn-primary" onclick="applyGeminiJson()">反映</button>
         </div>
       </div>
 
@@ -646,7 +928,7 @@
           </div>
           <div class="form-group">
             <label>購入店舗</label>
-            <input type="text" id="inShop" placeholder="例：エノテカ 横浜店">
+            <input type="text" id="inShop" placeholder="例：世界のワイン葡萄屋 鶴見店">
           </div>
         </div>
 
@@ -700,17 +982,150 @@
 
   <script>
     let wineData = [];
+    let currentView = "home";
     let currentType = "all";
+    let currentCountryFilter = "all";
     let currentSearch = "";
     let currentSort = "newest";
 
-    function showToast(msg, duration = 3500) {
+    // 国名マッピング（日本語 ⇔ ISO数値コード / 英語名 / 行政区画TopoJSON URL）
+    const COUNTRY_META = {
+      "イタリア": { isoNum: "380", en: "Italy", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/italy/italy-regions.json" },
+      "フランス": { isoNum: "250", en: "France", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/france/france-departments.json" },
+      "スペイン": { isoNum: "724", en: "Spain", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/spain/spain-provinces.json" },
+      "日本": { isoNum: "392", en: "Japan", adminUrl: "https://raw.githubusercontent.com/dataofjapan/land/master/japan.topojson" },
+      "アメリカ": { isoNum: "840", en: "United States of America", adminUrl: "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json" },
+      "チリ": { isoNum: "152", en: "Chile", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/chile/chile-regions.json" },
+      "ドイツ": { isoNum: "276", en: "Germany", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/germany/germany-states.json" },
+      "オーストラリア": { isoNum: "036", en: "Australia", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/australia/australia-states.json" },
+      "ニュージーランド": { isoNum: "554", en: "New Zealand", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/new-zealand/new-zealand-regional-councils.json" },
+      "アルゼンチン": { isoNum: "032", en: "Argentina", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/argentina/argentina-provinces.json" },
+      "ポルトガル": { isoNum: "620", en: "Portugal", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/portugal/portugal-districts.json" },
+      "南アフリカ": { isoNum: "710", en: "South Africa", adminUrl: "https://raw.githubusercontent.com/deldersveld/topojson/master/countries/south-africa/south-africa-provinces.json" }
+    };
+
+    function showToast(msg, duration = 3200) {
       const toast = document.getElementById("statusToast");
       toast.textContent = msg;
       toast.style.display = "block";
       setTimeout(() => { toast.style.display = "none"; }, duration);
     }
 
+    // リフレッシュボタン処理
+    async function manualRefresh() {
+      const btn = document.getElementById("refreshBtn");
+      btn.classList.add("spin");
+      showToast("🔄 最新データを取得中...");
+      await loadWines(true);
+      btn.classList.remove("spin");
+      showToast("✅ 最新の状態に更新しました");
+    }
+
+    // ビュー切り替え（ホーム ⇔ ダッシュボード）
+    function toggleDashboard() {
+      if (currentView === "home") {
+        switchView("dashboard");
+      } else {
+        switchView("home");
+      }
+    }
+
+    function switchView(view) {
+      currentView = view;
+      const homeView = document.getElementById("homeView");
+      const dashView = document.getElementById("dashboardView");
+      const searchSec = document.getElementById("homeSearchSection");
+      const dashBtn = document.getElementById("dashboardToggleBtn");
+
+      if (view === "dashboard") {
+        homeView.classList.remove("active");
+        dashView.classList.add("active");
+        searchSec.style.display = "none";
+        dashBtn.classList.add("btn-active-nav");
+        dashBtn.textContent = "🍷 一覧";
+        initDashboard();
+      } else {
+        dashView.classList.remove("active");
+        homeView.classList.add("active");
+        searchSec.style.display = "flex";
+        dashBtn.classList.remove("btn-active-nav");
+        dashBtn.textContent = "📊";
+      }
+    }
+
+    // 検索バーのクイックフィルター展開・制御
+    function openQuickFilter() {
+      document.getElementById("quickFilterDrawer").classList.add("open");
+    }
+
+    document.addEventListener("click", (e) => {
+      const searchSec = document.getElementById("homeSearchSection");
+      if (searchSec && !searchSec.contains(e.target)) {
+        // フィルターが未選択かつ検索文字が空なら閉じる
+        if (currentType === "all" && currentCountryFilter === "all" && !currentSearch) {
+          document.getElementById("quickFilterDrawer").classList.remove("open");
+        }
+      }
+    });
+
+    function updateClearButton() {
+      const btn = document.getElementById("clearSearchBtn");
+      btn.style.display = (currentSearch || currentType !== "all" || currentCountryFilter !== "all") ? "block" : "none";
+    }
+
+    function resetAllFilters() {
+      currentSearch = "";
+      currentType = "all";
+      currentCountryFilter = "all";
+      document.getElementById("searchInput").value = "";
+      document.querySelectorAll("#typeFilterPills .pill").forEach(p => p.classList.toggle("active", p.dataset.type === "all"));
+      document.querySelectorAll("#countryFilterPills .pill").forEach(p => p.classList.remove("active"));
+      updateClearButton();
+      renderWines();
+    }
+
+    // 購入数上位3カ国のクイックフィルターボタンを生成
+    function renderTopCountryFilters() {
+      const counts = {};
+      wineData.forEach(w => {
+        if (!w.country) return;
+        const c = w.country.trim();
+        counts[c] = (counts[c] || 0) + 1;
+      });
+      const top3 = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+
+      const container = document.getElementById("countryFilterPills");
+      if (top3.length === 0) {
+        container.style.display = "none";
+        return;
+      }
+      container.style.display = "flex";
+      container.innerHTML = `<span class="filter-group-label">上位国</span>` + top3.map(([country, cnt]) => `
+        <button class="pill country-pill ${currentCountryFilter === country ? "active" : ""}" data-country="${country}">
+          ${country} (${cnt})
+        </button>
+      `).join("");
+
+      container.querySelectorAll(".country-pill").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const c = btn.dataset.country;
+          if (currentCountryFilter === c) {
+            currentCountryFilter = "all";
+            btn.classList.remove("active");
+          } else {
+            currentCountryFilter = c;
+            container.querySelectorAll(".country-pill").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+          }
+          updateClearButton();
+          renderWines();
+        });
+      });
+    }
+
+    // GitHub API 設定・通信
     function getGitHubConfig() {
       return {
         owner: localStorage.getItem("gh_wine_owner") || "",
@@ -736,7 +1151,7 @@
       localStorage.setItem("gh_wine_token", document.getElementById("cfgToken").value.trim());
       closeModal("settingsModal");
       showToast("✅ GitHub設定を保存しました");
-      loadWines();
+      loadWines(true);
     }
 
     function openAddModal() {
@@ -817,12 +1232,8 @@
       });
     }
 
-    function utf8ToBase64(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
-    function base64ToUtf8(b64) {
-      return decodeURIComponent(escape(atob(b64)));
-    }
+    function utf8ToBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
+    function base64ToUtf8(b64) { return decodeURIComponent(escape(atob(b64))); }
 
     async function githubRequest(path, method = "GET", body = null) {
       const cfg = getGitHubConfig();
@@ -833,7 +1244,8 @@
           "Authorization": `Bearer ${cfg.token}`,
           "Accept": "application/vnd.github+json",
           "Content-Type": "application/json"
-        }
+        },
+        cache: "no-store"
       };
       if (body) options.body = JSON.stringify(body);
       const res = await fetch(url, options);
@@ -844,21 +1256,23 @@
       return res.json();
     }
 
-    async function loadWines() {
+    async function loadWines(forceFresh = false) {
       const cfg = getGitHubConfig();
       try {
         if (cfg.owner && cfg.repo && cfg.token) {
-          const res = await githubRequest(`wines.json?ref=${cfg.branch}`);
+          const res = await githubRequest(`wines.json?ref=${cfg.branch}&t=${Date.now()}`);
           wineData = JSON.parse(base64ToUtf8(res.content));
         } else {
-          const res = await fetch(`wines.json?t=${Date.now()}`);
+          const res = await fetch(`wines.json?t=${Date.now()}`, { cache: "no-store" });
           if (res.ok) wineData = await res.json();
         }
       } catch (e) {
         console.warn("wines.json読み込み待機:", e);
         wineData = [];
       }
+      renderTopCountryFilters();
       renderWines();
+      if (currentView === "dashboard") initDashboard();
     }
 
     async function handleSaveWine(event) {
@@ -886,7 +1300,7 @@
         let currentList = [];
         let fileSha = null;
         try {
-          const existing = await githubRequest(`wines.json?ref=${cfg.branch}`);
+          const existing = await githubRequest(`wines.json?ref=${cfg.branch}&t=${Date.now()}`);
           fileSha = existing.sha;
           currentList = JSON.parse(base64ToUtf8(existing.content));
         } catch (e) {}
@@ -917,9 +1331,10 @@
         await githubRequest("wines.json", "PUT", putBody);
 
         wineData = currentList;
+        renderTopCountryFilters();
         renderWines();
         closeModal("addModal");
-        showToast("🎉 保存完了！数十秒後に公開ページにも反映されます", 4500);
+        showToast("🎉 保存完了！公開ページにも反映されます", 4000);
       } catch (err) {
         alert("保存に失敗しました: " + err.message);
       } finally {
@@ -940,7 +1355,7 @@
 
       try {
         showToast("🗑️ 削除処理中...");
-        const existing = await githubRequest(`wines.json?ref=${cfg.branch}`);
+        const existing = await githubRequest(`wines.json?ref=${cfg.branch}&t=${Date.now()}`);
         const currentList = JSON.parse(base64ToUtf8(existing.content));
         const updatedList = currentList.filter(w => w.id !== id);
 
@@ -963,6 +1378,7 @@
         }
 
         wineData = updatedList;
+        renderTopCountryFilters();
         renderWines();
         closeModal("detailModal");
         showToast("✅ 削除が完了しました");
@@ -972,9 +1388,9 @@
     }
 
     function getPlaceholderImage(type) {
-      const colors = { "赤": "#4c0519", "白": "#713f12", "オレンジ": "#7c2d12", "ロゼ": "#881337" };
-      const bg = colors[type] || "#292524";
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500"><rect width="400" height="500" fill="${bg}"/><text x="200" y="250" font-family="sans-serif" font-size="22" fill="#fff" text-anchor="middle">${type} WINE</text></svg>`;
+      const colors = { "赤": "#4A2E3A", "白": "#6E4B35", "オレンジ": "#7c3f1d", "ロゼ": "#693148" };
+      const bg = colors[type] || "#2C2136";
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="500"><rect width="400" height="500" fill="${bg}"/><text x="200" y="250" font-family="sans-serif" font-size="22" fill="#A6783A" text-anchor="middle">${type} WINE</text></svg>`;
       return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
     }
 
@@ -984,8 +1400,9 @@
 
       const filtered = wineData.filter(wine => {
         if (currentType !== "all" && wine.type !== currentType) return false;
+        if (currentCountryFilter !== "all" && (wine.country || "").trim() !== currentCountryFilter) return false;
         if (!query) return true;
-        return [wine.name, wine.type, wine.grape, wine.country, wine.region, wine.purchaseDate]
+        return [wine.name, wine.type, wine.grape, wine.country, wine.region, wine.purchaseDate, wine.winery, wine.shop]
           .join(" ").toLowerCase().includes(query);
       });
 
@@ -998,7 +1415,7 @@
 
       if (filtered.length === 0) {
         wineGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 16px; color:var(--text-muted); font-size:0.9rem;">
-          ワインの記録がまだないか、検索条件に一致するものがありません。<br>右上の「＋ 追加」から最初の1本を登録しましょう！
+          条件に一致するワインが見つかりませんでした。
         </div>`;
         return;
       }
@@ -1028,7 +1445,7 @@
 
       const content = document.getElementById("detailModalContent");
       content.setAttribute("data-type", wine.type);
-      content.scrollTop = 0; // 開いたときに必ず一番上から表示
+      content.scrollTop = 0;
 
       const badge = document.getElementById("modalBadge");
       badge.textContent = wine.type;
@@ -1051,16 +1468,305 @@
       document.getElementById("detailModal").classList.add("open");
     }
 
-    document.getElementById("searchInput").addEventListener("input", e => { currentSearch = e.target.value; renderWines(); });
-    document.getElementById("filterPills").addEventListener("click", e => {
-      if (!e.target.classList.contains("pill")) return;
-      document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
-      e.target.classList.add("active");
-      currentType = e.target.getAttribute("data-type");
+    /* ==========================================
+       📊 ダッシュボード＆世界地図／県州マップ描画ロジック
+       ========================================== */
+    let worldTopoCache = null;
+
+    function initDashboard() {
+      document.getElementById("kpiTotal").textContent = `${wineData.length}本`;
+
+      const countryCounts = {};
+      wineData.forEach(w => {
+        if (!w.country) return;
+        const c = w.country.trim();
+        countryCounts[c] = (countryCounts[c] || 0) + 1;
+      });
+
+      const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+      document.getElementById("kpiCountries").textContent = `${sortedCountries.length}カ国`;
+      document.getElementById("kpiTopCountry").textContent = sortedCountries.length > 0 ? `${sortedCountries[0][0]} (${sortedCountries[0][1]})` : "-";
+
+      const chipList = document.getElementById("countryChipList");
+      if (sortedCountries.length === 0) {
+        chipList.innerHTML = `<span style="font-size:0.8rem; color:var(--text-muted);">まだワインが登録されていません</span>`;
+      } else {
+        chipList.innerHTML = sortedCountries.map(([c, cnt]) => `
+          <div class="country-stat-chip" onclick="zoomToCountry('${c}')">
+            <span>${c}</span>
+            <span class="badge">${cnt}本</span>
+          </div>
+        `).join("");
+      }
+
+      renderWorldMap();
+    }
+
+    // 明るさスケール（未購入は暗いプラム、購入数に応じてゴールドに明るく発光）
+    function getCountryFill(count, maxCount) {
+      if (!count || count === 0) return "#221a2b";
+      const ratio = Math.min(1, count / Math.max(1, maxCount));
+      const interp = d3.interpolateRgb("#6E4B35", "#f5c16c");
+      return interp(0.25 + ratio * 0.75);
+    }
+
+    async function renderWorldMap() {
+      document.getElementById("mapViewTitle").textContent = "🌍 ワイン生産国マップ（明るさ＝購入数）";
+      document.getElementById("backToWorldBtn").style.display = "none";
+      document.getElementById("mapLegend").style.display = "flex";
+      document.getElementById("countryShortcutSection").style.display = "block";
+      document.getElementById("wineryListSection").style.display = "none";
+
+      const wrap = document.getElementById("mapCanvasWrap");
+      wrap.querySelectorAll("svg").forEach(el => el.remove());
+
+      const width = wrap.clientWidth || 600;
+      const height = wrap.clientHeight || 360;
+
+      const svg = d3.select(wrap).append("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`);
+
+      const g = svg.append("g");
+      const tooltip = document.getElementById("mapTooltip");
+
+      // ズーム＆パン対応
+      const zoom = d3.zoom().scaleExtent([1, 8]).on("zoom", (e) => {
+        g.attr("transform", e.transform);
+      });
+      svg.call(zoom);
+
+      if (!worldTopoCache) {
+        const res = await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+        worldTopoCache = await res.json();
+      }
+
+      const countries = topojson.feature(worldTopoCache, worldTopoCache.objects.countries);
+      // 南極を除外して見やすくする
+      countries.features = countries.features.filter(d => d.id !== "010");
+
+      const projection = d3.geoNaturalEarth1().fitSize([width, height], countries);
+      const path = d3.geoPath().projection(projection);
+
+      // ISO番号と日本語国名の逆引きマップとカウント
+      const isoToJp = {};
+      Object.entries(COUNTRY_META).forEach(([jp, meta]) => { isoToJp[meta.isoNum] = jp; });
+
+      const countryCounts = {};
+      wineData.forEach(w => {
+        const c = (w.country || "").trim();
+        if (c) countryCounts[c] = (countryCounts[c] || 0) + 1;
+      });
+      const maxCount = Math.max(1, ...Object.values(countryCounts));
+
+      g.selectAll("path")
+        .data(countries.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("fill", d => {
+          const jpName = isoToJp[String(d.id).padStart(3, "0")];
+          const cnt = jpName ? (countryCounts[jpName] || 0) : 0;
+          return getCountryFill(cnt, maxCount);
+        })
+        .attr("stroke", "#4A2E3A")
+        .attr("stroke-width", 0.6)
+        .style("cursor", d => {
+          const jpName = isoToJp[String(d.id).padStart(3, "0")];
+          return (jpName && countryCounts[jpName]) ? "pointer" : "default";
+        })
+        .on("mousemove", (event, d) => {
+          const jpName = isoToJp[String(d.id).padStart(3, "0")] || d.properties.name;
+          const cnt = countryCounts[jpName] || 0;
+          tooltip.style.display = "block";
+          tooltip.style.left = (event.offsetX + 12) + "px";
+          tooltip.style.top = (event.offsetY - 28) + "px";
+          tooltip.innerHTML = `<strong>${jpName}</strong>: ${cnt}本${cnt > 0 ? "（タップで拡大）" : ""}`;
+        })
+        .on("mouseleave", () => { tooltip.style.display = "none"; })
+        .on("click", (event, d) => {
+          const jpName = isoToJp[String(d.id).padStart(3, "0")];
+          if (jpName && countryCounts[jpName]) {
+            tooltip.style.display = "none";
+            zoomToCountry(jpName);
+          }
+        });
+    }
+
+    // ワイナリー・地域名から緯度経度を検索（Nominatim API + localStorageキャッシュ）
+    async function geocodeLocation(query, countryEn) {
+      const cacheKey = "geo_cache_" + query;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) return JSON.parse(cached);
+
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query + " " + countryEn)}`;
+        const res = await fetch(url, { headers: { "Accept-Language": "ja,en" } });
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const coords = [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+          localStorage.setItem(cacheKey, JSON.stringify(coords));
+          return coords;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    // 国クリック時：県・州ごとの境界線マップへ遷移し、ワイナリー位置をプロット
+    async function zoomToCountry(jpCountryName) {
+      const meta = COUNTRY_META[jpCountryName];
+      const targetWines = wineData.filter(w => (w.country || "").trim() === jpCountryName);
+
+      document.getElementById("mapViewTitle").textContent = `📍 ${jpCountryName}のワイナリーマップ（${targetWines.length}本）`;
+      document.getElementById("backToWorldBtn").style.display = "inline-flex";
+      document.getElementById("mapLegend").style.display = "none";
+      document.getElementById("countryShortcutSection").style.display = "none";
+      document.getElementById("wineryListSection").style.display = "block";
+
+      const wrap = document.getElementById("mapCanvasWrap");
+      wrap.querySelectorAll("svg").forEach(el => el.remove());
+
+      const width = wrap.clientWidth || 600;
+      const height = wrap.clientHeight || 360;
+      const svg = d3.select(wrap).append("svg").attr("viewBox", `0 0 ${width} ${height}`);
+      const g = svg.append("g");
+      const tooltip = document.getElementById("mapTooltip");
+
+      const zoom = d3.zoom().scaleExtent([1, 12]).on("zoom", (e) => {
+        g.attr("transform", e.transform);
+      });
+      svg.call(zoom);
+
+      // 行政区画（県・州）境界線の読み込み
+      let geoFeature = null;
+      if (meta && meta.adminUrl) {
+        try {
+          const res = await fetch(meta.adminUrl);
+          const topo = await res.json();
+          const objKey = Object.keys(topo.objects)[0];
+          geoFeature = topojson.feature(topo, topo.objects[objKey]);
+        } catch (e) {
+          console.warn("行政区画データ取得フォールバック:", e);
+        }
+      }
+
+      // フォールバック（万が一外部の県別TopoJSONが取れない場合は世界地図から該当国を拡大）
+      if (!geoFeature && worldTopoCache && meta) {
+        const worldCountries = topojson.feature(worldTopoCache, worldTopoCache.objects.countries);
+        const matched = worldCountries.features.find(d => String(d.id).padStart(3, "0") === meta.isoNum);
+        if (matched) geoFeature = matched;
+      }
+
+      if (!geoFeature) return;
+
+      const projection = d3.geoMercator().fitExtent([[24, 24], [width - 24, height - 24]], geoFeature);
+      const path = d3.geoPath().projection(projection);
+
+      // 県・州ごとのポリゴン＆境界線を描画
+      g.selectAll("path")
+        .data(geoFeature.features || [geoFeature])
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .attr("fill", "#2C2136")
+        .attr("stroke", "#A6783A")
+        .attr("stroke-width", 0.9)
+        .attr("stroke-opacity", 0.75)
+        .on("mousemove", (event, d) => {
+          const regName = (d.properties && (d.properties.NAME_1 || d.properties.name || d.properties.nam_ja)) || "";
+          if (!regName) return;
+          tooltip.style.display = "block";
+          tooltip.style.left = (event.offsetX + 12) + "px";
+          tooltip.style.top = (event.offsetY - 28) + "px";
+          tooltip.textContent = regName;
+        })
+        .on("mouseleave", () => { tooltip.style.display = "none"; });
+
+      // ワイナリーの座標を解決して地図上にプロット
+      const plotListEl = document.getElementById("wineryPlotList");
+      plotListEl.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted);">📍 ワイナリーの位置を検索してプロット中...</div>`;
+
+      const countryEn = meta ? meta.en : jpCountryName;
+      const plottedItems = [];
+
+      for (const wine of targetWines) {
+        // 括弧内の原語や地域名を優先して検索精度を高める
+        const rawRegion = (wine.region || "").split("/")[0].replace(/（.*?）/g, "").trim();
+        const rawWinery = (wine.winery || "").replace(/（.*?）/g, "").trim();
+
+        let coords = null;
+        if (rawWinery) coords = await geocodeLocation(`${rawWinery} ${rawRegion}`, countryEn);
+        if (!coords && rawRegion) coords = await geocodeLocation(rawRegion, countryEn);
+
+        plottedItems.push({ wine, coords });
+      }
+
+      // プロットピンを描画
+      plottedItems.forEach(({ wine, coords }) => {
+        if (!coords) return;
+        const [x, y] = projection(coords);
+        if (isNaN(x) || isNaN(y)) return;
+
+        const pinGroup = g.append("g")
+          .attr("transform", `translate(${x}, ${y})`)
+          .style("cursor", "pointer")
+          .on("click", () => openDetail(wine.id))
+          .on("mousemove", (event) => {
+            tooltip.style.display = "block";
+            tooltip.style.left = (event.offsetX + 12) + "px";
+            tooltip.style.top = (event.offsetY - 34) + "px";
+            tooltip.innerHTML = `🍷 <strong>${wine.winery || wine.name}</strong><br><span style="color:#d4a359;">${wine.name}</span>`;
+          })
+          .on("mouseleave", () => { tooltip.style.display = "none"; });
+
+        // 光彩リング
+        pinGroup.append("circle")
+          .attr("r", 9)
+          .attr("fill", "rgba(245, 193, 108, 0.28)");
+
+        // 中心ピン
+        pinGroup.append("circle")
+          .attr("r", 4.5)
+          .attr("fill", "#f5c16c")
+          .attr("stroke", "#121016")
+          .attr("stroke-width", 1.5);
+      });
+
+      // 下部のワイナリーリスト表示
+      plotListEl.innerHTML = plottedItems.map(({ wine, coords }) => `
+        <div class="winery-plot-item" onclick="openDetail('${wine.id}')">
+          <div>
+            <div style="font-size:0.84rem; font-weight:700; color:var(--text-main);">
+              ${coords ? "📍" : "🍷"} ${wine.winery || "ワイナリー未記載"}
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">${wine.name}（${wine.region}）</div>
+          </div>
+          <span style="font-size:0.75rem; color:var(--accent-gold-light);">詳細 →</span>
+        </div>
+      `).join("");
+    }
+
+    // イベントリスナー
+    document.getElementById("searchInput").addEventListener("input", e => {
+      currentSearch = e.target.value;
+      updateClearButton();
       renderWines();
     });
-    document.getElementById("sortSelect").addEventListener("change", e => { currentSort = e.target.value; renderWines(); });
 
+    document.getElementById("typeFilterPills").addEventListener("click", e => {
+      if (!e.target.classList.contains("pill")) return;
+      document.querySelectorAll("#typeFilterPills .pill").forEach(p => p.classList.remove("active"));
+      e.target.classList.add("active");
+      currentType = e.target.getAttribute("data-type");
+      updateClearButton();
+      renderWines();
+    });
+
+    document.getElementById("sortSelect").addEventListener("change", e => {
+      currentSort = e.target.value;
+      renderWines();
+    });
+
+    // 初期読み込み
     loadWines();
   </script>
 </body>
