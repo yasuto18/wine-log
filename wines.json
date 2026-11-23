@@ -1,5 +1,18 @@
 [
   {
+    "id": "wine_1795400375241",
+    "name": "ヴィッラ・カンビアージョ コーナ コロナータ ヴァル・ポルチェーヴェラ (Villa Cambiaso Cônâ Coronata Val Polcevera DOC)",
+    "type": "白",
+    "grape": "ビアンケッタ・ジェノヴェーゼ、ヴェルメンティーノ、ボスコ",
+    "country": "イタリア",
+    "region": "リグーリア州（ヴァル・ポルチェーヴェラ DOC / コロナータ）",
+    "purchaseDate": "2026-04-11",
+    "image": "images/wine_1795400375241.jpg",
+    "winery": "Villa Cambiaso - Marchesi Cattaneo Adorno Giustiniani（ヴィッラ・カンビアージョ）",
+    "shop": "Regalo",
+    "notes": "リグーリア州ジェノヴァ近郊の伝統地区コロナータで造られる希少な白ワイン。海風を感じる塩味と爽やかなハーブのニュアンスが特徴。"
+  },
+  {
     "id": "wine_1795400322723",
     "name": "ピエロパン カルヴァリーノ ソアーヴェ・クラッシコ 2013 & 2023 (Pieropan Calvarino Soave Classico DOC)",
     "type": "白",
